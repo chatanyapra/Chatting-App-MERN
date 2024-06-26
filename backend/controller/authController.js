@@ -71,7 +71,7 @@ export const loginUser = asyncHandler(async (req, res) => {
         })
 
     } catch (error) {
-        console.log("Error in Signup COntroller", error.message);
+        console.log("Error in Login Controller", error.message);
         res.status(500).json({message: "Internal Server Error!"});
     }
 })
