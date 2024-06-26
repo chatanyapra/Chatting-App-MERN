@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
+import generateTokenAndSetCookie from "../securityToken/generateToken.js";
 
 // signup public
 export const createUser = asyncHandler(async (req, res) => {
@@ -31,6 +32,8 @@ export const createUser = asyncHandler(async (req, res) => {
             profilePic: gender === "male" ? boyProfilePic : girlProfilePic
         })
         if(newUser){
+            // generate JWT token-----
+            generateTokenAndSetCookie(newUser._id, res);
             await newUser.save();
             res.status(201).json({
                 _id: newUser._id,
@@ -51,11 +54,37 @@ export const createUser = asyncHandler(async (req, res) => {
 
 // login public
 export const loginUser = asyncHandler(async (req, res) => {
-    res.status(200).json({message: "User Loggedin"});
+    try {
+        const {username, password} = req.body;
+        const user = await User.findOne({username});
+        const isPassword= await bcrypt.compare(password, user?.password || "");
+        if(!user || !isPassword){
+            res.status(400).json({error: "Invalid password or username"});
+        }
+        generateTokenAndSetCookie(user._id, res);
+
+        res.status(200).json({
+            _id: user._id,
+            fullname: user.fullname,
+            username: user.username,
+            profilePic: user.profilePic
+        })
+
+    } catch (error) {
+        console.log("Error in Signup COntroller", error.message);
+        res.status(500).json({message: "Internal Server Error!"});
+    }
 })
 
 // logout public
 export const logoutUser = asyncHandler(async (req, res) => {
-    res.status(200).json({message: "User Logged OUT"});
+    try {
+        res.cookie("jwt", "", {maxAge : 0});
+        res.status(200).json({message: "Logout Successfully!"});
+    } catch (error) {
+        console.log("Error in Logout Controller", error.message);
+        res.status(400).json({message: "Internal Server Error!"});
+    }
+
 })
 
