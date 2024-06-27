@@ -8,6 +8,5 @@ const generateTokenAndSetCookie = (userId, res) => {
         sameSite: "strict", //CSRF attack
         secure: process.env.JWT_SECRET !== "development"
     })
-    console.log("ook token");
 }
 export default generateTokenAndSetCookie;

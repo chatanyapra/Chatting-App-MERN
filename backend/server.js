@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import connectMongoose from "./dbConnection/dbConnection.js";
 import authRoutes from "./routes/authRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
 const port = process.env.PORT || 5001;
@@ -18,6 +19,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);
+app.use("/api/users/", userRoutes);
 
 app.listen(port, () => {
     connectMongoose();

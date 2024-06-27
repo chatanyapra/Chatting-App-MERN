@@ -35,3 +35,24 @@ export const sendMessage = asyncHandler( async(req, res) => {
     const receiverId = req.params.id;
     res.status(201).json({message: `Message sended! ${receiverId}`});
 })
+
+export const getMessages = asyncHandler(async(req, res) => {
+    try {
+        const {id:chatUserId} = req.params;
+        const senderId = req.user._id;
+
+        const conversation = await Conversation.findOne({
+            participants: {$all: [senderId, chatUserId]},
+        }).populate("messages");  //populate function not return the reference/_id but return the actual messages from the collection
+
+        if(!conversation){
+            return res.status(200).json([]);
+        }
+        const message = conversation.messages;
+        res.status(200).json(message);
+
+    } catch (error) {
+        console.log("Error in Message Controller", error.message);
+        res.status(400).json({message: "Internal Server Error!"});
+    }
+})
