@@ -1,5 +1,7 @@
 import React from 'react';
 import logo from "../../assets/auramicimage.png";
+import { Link } from 'react-router-dom';
+
 
 const Login: React.FC = () => {
     return (
@@ -15,7 +17,7 @@ const Login: React.FC = () => {
                 <div className='flex flex-col w-4/5 mt-8 h-4/5 bg-red-0 m-auto'>
                     <div className=''>
                         <h1 className='text-2xl font-semibold'>Sign in to your account</h1>
-                        {/* <small>If you haven’t signed up yet. Register here!</small> */}
+                        <small className='text-sm font-semibold'>If you haven’t signed up yet. <Link to={"/signup"} className='text-blue-700'>Register here!</Link></small>
                     </div>
                     <div className='mt-10'>
                         <form method="#" action="#" className="mx-10 space-y-7 text-sm text-black font-medium dark:text-white" uk-scrollspy="target: > *; cls: uk-animation-scale-up; delay: 100 ;repeat: true">
@@ -23,14 +25,14 @@ const Login: React.FC = () => {
                             <div>
                                 <label htmlFor="email" className="">Username / Email</label>
                                 <div className="mt-2.5">
-                                    <input id="email" name="email" type="email" placeholder="Username / Email" className="!w-full !rounded-lg !bg-transparent !shadow-md py-2 pl-3 border !border-slate-200 dark:!border-slate-800 dark:!bg-white/5" />
+                                    <input id="email" name="email" type="email" placeholder="Username / Email" className="!w-full !rounded-lg !bg-transparent shadow-md py-2 pl-3 border !border-slate-200 dark:!border-slate-800 dark:!bg-white/5" />
                                 </div>
                             </div>
                             {/* <!-- password --> */}
                             <div>
                                 <label htmlFor="email" className="">Password</label>
                                 <div className="mt-2.5">
-                                    <input id="password" name="password" type="password" placeholder="***" className="!w-full !rounded-lg !bg-transparent !shadow-md py-2 pl-3 border !border-slate-200 dark:!border-slate-800 dark:!bg-white/5" />
+                                    <input id="password" name="password" type="password" placeholder="***" className="!w-full !rounded-lg !bg-transparent shadow-md py-2 pl-3 border !border-slate-200 dark:!border-slate-800 dark:!bg-white/5" />
                                 </div>
                             </div>
 
