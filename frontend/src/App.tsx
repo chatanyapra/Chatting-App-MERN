@@ -1,28 +1,21 @@
 import './App.css'
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Login from './pages/login/Login'
 import Signup from './pages/signup/Signup'
 import Message from './pages/message/Message';
 import MessageBox from './components/MessageBox';
 import { Toaster } from 'react-hot-toast';
+import { useAuthContext } from './context/AuthContext';
 function App() {
-
+  const {authUser} = useAuthContext();
   return (
     <>
     <Router>
       <div>
-        {/* <nav>
-          <ul>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/about">Login</Link></li>
-            <li><Link to="/contact">Signup</Link></li>
-          </ul>
-        </nav> */}
-
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/message" element={<Message />} />
+          <Route path="/login" element={authUser ? <Navigate to={"/message"} /> : <Login/> } />
+          <Route path="/signup" element={authUser ? <Navigate to={"/message"} /> : <Signup/> } />
+          <Route path="/message" element={authUser ? <Message /> : <Navigate to={"/login"} />} />
           <Route path="/messageBox" element={<MessageBox visibility={true}/>} />
         </Routes>
         <Toaster/>

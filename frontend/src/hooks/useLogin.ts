@@ -2,21 +2,14 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useAuthContext } from '../context/AuthContext';
 
-interface SignupData {
-    fullname: string;
+interface LoginData {
     username: string;
     password: string;
-    confirmPassword: string;
-    gender: string;
 }
 
-function handleInputError({ fullname, username, password, confirmPassword, gender }: SignupData): boolean {
-    if (!fullname || !username || !password || !confirmPassword || !gender) {
+function handleInputError({ username, password}: LoginData): boolean {
+    if (!username || !password) {
         toast.error('Please fill in all fields');
-        return false;
-    }
-    if (password !== confirmPassword) {
-        toast.error('Password do not match');
         return false;
     }
     if (password.length < 6) {
@@ -26,20 +19,20 @@ function handleInputError({ fullname, username, password, confirmPassword, gende
     return true;
 }
 
-const useSignup = () => {
+const useLogin = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const {setAuthUser} = useAuthContext();
 
-    const signup = async ({ fullname, username, password, confirmPassword, gender }: SignupData) => {
-        const success = handleInputError({ fullname, username, password, confirmPassword, gender });
+    const login = async ({ username, password}: LoginData) => {
+        const success = handleInputError({ username, password});
         if (!success) return;
 
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/signup", {
+            const res = await fetch("/api/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ fullname, username, password, confirmPassword, gender }),
+                body: JSON.stringify({ username, password}),
             });
 
             const data = await res.json();
@@ -58,7 +51,7 @@ const useSignup = () => {
         }
     }
 
-    return { loading, signup };
+    return { loading, login };
 }
 
-export default useSignup;
+export default useLogin;
