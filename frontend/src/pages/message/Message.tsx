@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import MessageBox from '../../components/MessageBox';
 import '../../components/components.css'; // Adjust this based on your CSS file location
 import useLogout from '../../hooks/useLogout';
 import SidebarUsers from '../../components/SidebarUsers';
 import useGetConversation from '../../hooks/useGetConversation';
 import ChattingStart from '../../components/ChattingStart';
+import useConversation from '../../zustandStore/useConversation';
 
 interface Conversation {
     _id: string;
@@ -16,9 +17,14 @@ interface Conversation {
 export default function Message() {
     let textColor = 'black';
     let darkMode = false;
-    
+
     const { logout } = useLogout();
     const { loading, conversations } = useGetConversation();
+    const { selectedConversation, setSelectedConversation } = useConversation()
+    
+    useEffect(() => {
+        return () => setSelectedConversation(null)
+    },[setSelectedConversation])
 
     return (
         <>
@@ -36,16 +42,16 @@ export default function Message() {
 
                             <div className="flex mt-2 items-center justify-between">
 
-                                <h2 className={`text-2xl font-bold text-black ml-1 ${textColor === "" ? (darkMode ? 'text-white' : 'text-black') : textColor }`}> Chats </h2>
+                                <h2 className={`text-2xl font-bold text-black ml-1 ${textColor === "" ? (darkMode ? 'text-white' : 'text-black') : textColor}`}> Chats </h2>
 
                             </div>
 
                         </div>
                         <div className="small-scroll space-y-2 p-2 overflow-y-auto md:h-[calc(100vh-204px)] h-[calc(100vh-80px)]">
-                            
+
                             {conversations && conversations.map((conversation) => (
                                 <SidebarUsers
-                                    key={conversation._id} 
+                                    key={conversation._id}
                                     conversation={conversation as Conversation} // Type assertion here
                                 />
                             ))}
@@ -53,8 +59,8 @@ export default function Message() {
                         </div>
                     </div>
                 </div>
-                {/* <MessageBox visibility={false}/> */}
-                <ChattingStart visibility={false}/>
+                {selectedConversation ? <MessageBox conversation={selectedConversation} visibility={false} /> : <ChattingStart visibility={false} />}
+
             </div>
         </>
     );

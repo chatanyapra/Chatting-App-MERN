@@ -1,19 +1,32 @@
 // import "../Extra.css";
+import { FormEvent, ChangeEvent, useState } from 'react';
 import './components.css';
 import { LuSendHorizonal} from "react-icons/lu";
+import useSendMessage from '../hooks/useSendMessage';
 // import { useContext } from 'react';
 // import { ThemeContext } from '../context/theme';
-
+interface Conversation {
+    _id: string;
+    fullname: string;
+    profilePic: string;
+    username: string;
+}
 interface MyComponentProps {
     visibility : boolean;
+    conversation : Conversation;
 }
-const MessageBox: React.FC<MyComponentProps> = ({ visibility } : MyComponentProps) => {
-    // const themeContext = useContext(ThemeContext);
+const MessageBox: React.FC<MyComponentProps> = ({conversation, visibility } : MyComponentProps) => {
 
-    // if (!themeContext) {
-    //   throw new Error('ThemeToggle must be used within a ThemeProvider');
-    // }
-    // const { textColor } = themeContext;
+    const [newMessage, setNewMessage] = useState('');
+    const {loading, sendMessage} = useSendMessage();
+
+    const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if(!newMessage) return;
+        await sendMessage(newMessage);
+        setNewMessage('');
+    }
+
     let textColor = '';
     return (
         <div className={`w-full shadow-md bg-white rounded-xl dark:bg-black max-md:mt-20 max-md:${visibility ? 'visible' : 'hidden'}`}>
@@ -28,11 +41,11 @@ const MessageBox: React.FC<MyComponentProps> = ({ visibility } : MyComponentProp
                     </button>
 
                     <div className="relative cursor-pointer max-md:hidden">
-                        <img src="assets/images/avatars/avatar-6.jpg" alt="" className="w-8 h-8 rounded-full shadow" />
+                        <img src={conversation.profilePic} alt="" className="w-8 h-8 rounded-full shadow" />
                         <div className="w-2 h-2 bg-teal-500 rounded-full absolute right-0 bottom-0 m-px"></div>
                     </div>
                     <div className="cursor-pointer">
-                        <div className="text-base font-bold"> Monroe Parker</div>
+                        <div className="text-base font-bold">{conversation.fullname}</div>
                         <div className="text-xs text-green-500 font-semibold"> Online</div>
                     </div>
 
@@ -62,10 +75,10 @@ const MessageBox: React.FC<MyComponentProps> = ({ visibility } : MyComponentProp
             <div className="small-scroll w-full p-5 py-10 overflow-y-auto md:h-[calc(100vh-260px)] h-[calc(100vh-195px)]">
 
                 <div  className="py-10 text-center text-sm lg:pt-8">
-                    <img src="https://randomuser.me/api/portraits/men/1.jpg" className="w-24 h-24 rounded-full mx-auto mb-3" alt="" />
+                    <img src={conversation.profilePic} className="w-24 h-24 rounded-full mx-auto mb-3" alt="" />
                     <div className="mt-8">
-                        <div className="md:text-xl text-base font-medium text-black dark:text-white"> Monroe Parker </div>
-                        <div className="text-gray-500 text-sm   dark:text-white/80"> @Monroepark </div>
+                        <div className="md:text-xl text-base font-medium text-black dark:text-white"> {conversation.fullname} </div>
+                        <div className="text-gray-500 text-sm   dark:text-white/80"> {conversation.username} </div>
                     </div>
                     <div className="mt-3.5">
                         <a href="timeline.html" className="inline-block rounded-lg px-4 py-1.5 text-sm font-semibold bg-secondery">View profile</a>
@@ -192,18 +205,20 @@ const MessageBox: React.FC<MyComponentProps> = ({ visibility } : MyComponentProp
             </div>
 
             {/* <!-- sending message area --> */}
-            <div className="flex items-center justify-center md:p-3 h-14 p-2 overflow-hidden">
+            <form onSubmit={handleSubmit} className="flex items-center justify-center md:p-3 h-14 p-2 overflow-hidden">
 
                 <div className="w-full flex justify-between">
-                    <textarea placeholder="Write your message" rows={1} style={{width: '95%'}} className="resize-none bg-secondery rounded-full px-4 p-2 shadow-md border-t border-gray-400"></textarea>
+                    <input placeholder="Write your message" style={{width: '95%'}} className="resize-none bg-secondery rounded-full px-4 p-2 shadow-md border-t border-gray-400"
+                        value={newMessage} onChange={(event : ChangeEvent<HTMLInputElement> ) => setNewMessage(event.target.value)}
+                    />
 
-                    <button type="button" className="text-white shrink-0 p-2 border-t border-gray-400 rounded-full bg-green-200 mt-1 mx-2 shadow-md">
-                        <LuSendHorizonal  className="text-xl flex text-blue-600 "/>
+                    <button type="submit" className="text-white shrink-0 p-2 border-t border-gray-400 rounded-full bg-green-200 mt-1 mx-2 shadow-md" disabled={loading}>
+                        {loading ? <div className="loader"></div> : <LuSendHorizonal  className="text-xl flex text-blue-600 "/>}
                     </button>
 
                 </div>
 
-            </div>
+            </form>
         </div>
     )
 }

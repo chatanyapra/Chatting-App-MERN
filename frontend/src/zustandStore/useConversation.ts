@@ -10,7 +10,6 @@ interface Conversation {
 interface Message {
   _id: string;
   message: string;
-  timestamp: number;
 }
 
 interface ConversationState {
@@ -22,9 +21,9 @@ interface ConversationState {
 
 const useConversation = create<ConversationState>((set) => ({
   selectedConversation: null,
-  setSelectedConversation: (selectedConversation) => set({ selectedConversation }),
+  setSelectedConversation: (selectedConversation :Conversation | null) => set({ selectedConversation }),
   message: [],
-  setMessage: (message) => set({ message })
+  setMessage: (message : Message[]) => set({ message })
 }));
 
 export default useConversation;
