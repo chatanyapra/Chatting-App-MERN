@@ -7,7 +7,7 @@ import { LuSendHorizonal} from "react-icons/lu";
 interface MyComponentProps {
     visibility : boolean;
 }
-const MessageBox: React.FC<MyComponentProps> = ({ visibility }) => {
+const MessageBox: React.FC<MyComponentProps> = ({ visibility } : MyComponentProps) => {
     // const themeContext = useContext(ThemeContext);
 
     // if (!themeContext) {

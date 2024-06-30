@@ -4,6 +4,7 @@ import '../../components/components.css'; // Adjust this based on your CSS file 
 import useLogout from '../../hooks/useLogout';
 import SidebarUsers from '../../components/SidebarUsers';
 import useGetConversation from '../../hooks/useGetConversation';
+import ChattingStart from '../../components/ChattingStart';
 
 interface Conversation {
     _id: string;
@@ -52,7 +53,8 @@ export default function Message() {
                         </div>
                     </div>
                 </div>
-                <MessageBox visibility={false}/>
+                {/* <MessageBox visibility={false}/> */}
+                <ChattingStart visibility={false}/>
             </div>
         </>
     );
