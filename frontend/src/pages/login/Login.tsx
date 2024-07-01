@@ -10,7 +10,6 @@ const Login: React.FC = () => {
     const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         await login({username, password});
-        
     }
     return (
         <div className='flex w-100vw h-screen bg-black m-0 p-0'>

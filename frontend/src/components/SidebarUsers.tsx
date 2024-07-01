@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import useConversation from "../zustandStore/useConversation";
 interface Conversation {
@@ -14,24 +14,25 @@ function SidebarUsers({ conversation }: { conversation: Conversation }) {
         height: window.innerHeight
     });
 
-    useEffect(() => {
-        // Handler to call on window resize
-        const handleResize = () => {
-            setWindowSize({
-                width: window.innerWidth,
-                height: window.innerHeight
-            });
-        };
-        window.addEventListener('resize', handleResize);
-        handleResize();
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    // useEffect(() => {
+    //     // Handler to call on window resize
+    //     const handleResize = () => {
+    //         setWindowSize({
+    //             width: window.innerWidth,
+    //             height: window.innerHeight
+    //         });
+    //     };
+    //     window.addEventListener('resize', handleResize);
+    //     handleResize();
+    //     return () => window.removeEventListener('resize', handleResize);
+    // }, []);
+
     const {selectedConversation, setSelectedConversation} = useConversation();
     const isSelected = selectedConversation?._id === conversation._id;
 
     return (
-        <Link to={windowSize.width >= 768 ? "#" : "/messageBox"} className={`md:w-80 w-full relative flex items-center gap-4 p-2 ${ isSelected ? 'bg-gray-100' : "" } duration-200 rounded-xl hover:bg-secondery`}
-         onClick={() => setSelectedConversation(conversation)}
+        <div className={`md:w-80 w-full relative flex items-center gap-4 p-2 ${ isSelected ? 'bg-gray-100' : "" } duration-200 rounded-xl hover:bg-secondery`}
+         onClick={()=> setSelectedConversation(conversation)}
         >
             <div className="relative w-14 h-14 shrink-0">
                 <img src={conversation.profilePic} alt="" className="object-cover w-full h-full rounded-full" />
@@ -44,7 +45,7 @@ function SidebarUsers({ conversation }: { conversation: Conversation }) {
                 </div>
                 <div className="font-medium overflow-hidden text-ellipsis text-sm whitespace-nowrap">Love your photos 😍</div>
             </div>
-        </Link>
+        </div>
     )
 }
 

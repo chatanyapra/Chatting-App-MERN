@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import MessageBox from '../../components/MessageBox';
 import '../../components/components.css'; // Adjust this based on your CSS file location
 import useLogout from '../../hooks/useLogout';
@@ -21,10 +21,37 @@ export default function Message() {
     const { logout } = useLogout();
     const { loading, conversations } = useGetConversation();
     const { selectedConversation, setSelectedConversation } = useConversation()
+    const [ visibilityChat, setVisibilityChat ] = useState(false)
     
     useEffect(() => {
         return () => setSelectedConversation(null)
     },[setSelectedConversation])
+
+    const [windowSize, setWindowSize] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight
+    });
+    useEffect(() => {
+        // Handler to call on window resize
+        const handleResize = () => {
+            setWindowSize({
+                width: window.innerWidth,
+                height: window.innerHeight
+            });
+        };
+        window.addEventListener('resize', handleResize);
+        handleResize();
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+    useEffect(() => {
+        if (windowSize.width <= 768 && selectedConversation !== null) {
+            setVisibilityChat(true);
+            console.log(visibilityChat, " value");
+        }else{
+            setVisibilityChat(false);
+            console.log(visibilityChat,"value");
+        }
+    },[selectedConversation])
 
     return (
         <>
@@ -33,12 +60,12 @@ export default function Message() {
                 Logout
             </div>
             <div className="flex px-14 mt-24 max-md:px-0  max-md:mt-20  max-md:w-full">
-                <div className="max-md:w-full relative">
+                <div className={`max-md:w-full relative ${visibilityChat ? "hidden" : ""}`}>
 
                     <div id="side-chat" className="shadow-md rounded-xl w-full bg-white z-50 max-md:shadow dark:bg-black">
 
                         {/* <!-- heading title --> */}
-                        <div className="p-4 border-b dark:border-slate-700 max-md:hidden">
+                        <div className="p-4 border-b dark:border-slate-700 ">
 
                             <div className="flex mt-2 items-center justify-between">
 
@@ -58,9 +85,8 @@ export default function Message() {
 
                         </div>
                     </div>
-                </div>
-                {selectedConversation ? <MessageBox conversation={selectedConversation} visibility={false} /> : <ChattingStart visibility={false} />}
-
+                </div>                
+                {selectedConversation !== null ? <MessageBox conversation={selectedConversation} visibility={visibilityChat} /> : <ChattingStart visibility={false} />}
             </div>
         </>
     );

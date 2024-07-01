@@ -6,8 +6,16 @@ import Message from './pages/message/Message';
 import MessageBox from './components/MessageBox';
 import { Toaster } from 'react-hot-toast';
 import { useAuthContext } from './context/AuthContext';
+import useConversation from './zustandStore/useConversation';
+interface Conversation {
+  _id: string;
+  username: string;
+  fullname: string;
+  profilePic: string;
+}
 function App() {
   const {authUser} = useAuthContext();
+  const { selectedConversation } = useConversation();
   return (
     <>
     <Router>
@@ -16,7 +24,7 @@ function App() {
           <Route path="/login" element={authUser ? <Navigate to={"/message"} /> : <Login/> } />
           <Route path="/signup" element={authUser ? <Navigate to={"/message"} /> : <Signup/> } />
           <Route path="/message" element={authUser ? <Message /> : <Navigate to={"/login"} />} />
-          <Route path="/messageBox" element={<MessageBox visibility={true}/>} />
+          {/* <Route path="/messageBox" element={selectedConversation !== null ? <MessageBox conversation={selectedConversation} visibility={true}/> : ""} /> */}
         </Routes>
         <Toaster/>
       </div>

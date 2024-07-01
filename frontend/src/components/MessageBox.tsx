@@ -29,7 +29,7 @@ const MessageBox: React.FC<MyComponentProps> = ({conversation, visibility } : My
 
     let textColor = '';
     return (
-        <div className={`w-full shadow-md bg-white rounded-xl dark:bg-black max-md:mt-20 max-md:${visibility ? 'visible' : 'hidden'}`}>
+        <div className={`w-full shadow-md bg-white rounded-xl dark:bg-black mt-0 max-md:${visibility ? 'visible' : 'hidden'}`}>
             {/* <!-- chat heading --> */}
             <div className="flex items-center justify-between gap-2 px-6 z-10 border-b dark:border-slate-700 uk-animation-slide-top-medium">
 
