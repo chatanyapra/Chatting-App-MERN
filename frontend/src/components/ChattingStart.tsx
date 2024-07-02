@@ -25,7 +25,7 @@ const ChattingStart: React.FC<MyComponentProps> = ({ visibility }: MyComponentPr
         <div className="py-5 text-center text-sm lg:pt-8 h-auto overflow-hidden collapsibleDiv collapsedDiv" >
           <img src={authUser.profilePic} className="w-24 h-24 rounded-full mx-auto mb-3" alt="" />
           <div className="mt-8">
-            <h2 className="md:text-xl text-base font-medium text-green-500">Welcome </h2>
+            <h2 className="md:text-xl text-base font-medium   text-green-500">Welcome </h2>
             <div className="md:text-xl text-base font-medium text-black dark:text-white">{authUser.fullname} </div>
           </div>
         </div>

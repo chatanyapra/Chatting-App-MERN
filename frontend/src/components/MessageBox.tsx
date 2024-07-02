@@ -1,9 +1,8 @@
 // import "../Extra.css";
 import { FormEvent, ChangeEvent, useState } from 'react';
 import './components.css';
-import { LuSendHorizonal} from "react-icons/lu";
+import { LuSendHorizonal } from "react-icons/lu";
 import useSendMessage from '../hooks/useSendMessage';
-import useGetMessages from '../hooks/useGetMessages';
 import MessageText from './MessageText';
 // import { useContext } from 'react';
 // import { ThemeContext } from '../context/theme';
@@ -14,20 +13,17 @@ interface Conversation {
     username: string;
 }
 interface MyComponentProps {
-    visibility : boolean;
-    conversation : Conversation;
+    visibility: boolean;
+    conversation: Conversation;
 }
-const MessageBox: React.FC<MyComponentProps> = ({conversation, visibility } : MyComponentProps) => {
+const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: MyComponentProps) => {
 
     const [newMessage, setNewMessage] = useState('');
-    const {loading, sendMessage} = useSendMessage();
-    const {messages} = useGetMessages();
-    console.log(messages);
-    
+    const { loading, sendMessage } = useSendMessage();
 
-    const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if(!newMessage) return;
+        if (!newMessage) return;
         await sendMessage(newMessage);
         setNewMessage('');
     }
@@ -73,23 +69,30 @@ const MessageBox: React.FC<MyComponentProps> = ({conversation, visibility } : My
 
             {/* <!-- chats bubble --> */}
             <div className="small-scroll w-full p-5 py-10 overflow-y-auto md:h-[calc(100vh-260px)] h-[calc(100vh-195px)]">
-
+                <div className="py-5 text-center text-sm lg:pt-8 h-auto overflow-hidden" >
+                    <img src={conversation.profilePic} className="w-24 h-24 rounded-full mx-auto mb-3" alt="" />
+                    <div className="mt-8">
+                        <div className="md:text-xl text-base font-medium text-black dark:text-white"> {conversation.fullname} </div>
+                        <div className="text-gray-500 text-sm   dark:text-white/80"> {conversation.username} </div>
+                    </div>
+                </div>
                 <div className="text-sm font-medium space-y-6">
-                    <MessageText/>
+                    <MessageText />
                 </div>
 
             </div>
 
             {/* <!-- sending message area --> */}
-            <form onSubmit={handleSubmit} className="flex items-center justify-center md:p-3 h-14 p-2 overflow-hidden">
+            <form onSubmit={handleSubmit} className="flex items-center justify-center md:px-2 min-h-14 p-2 overflow-hidden">
 
                 <div className="w-full flex justify-between">
-                    <input placeholder="Write your message" style={{width: '95%'}} className="resize-none bg-secondery rounded-full px-4 p-2 shadow-md border-t border-gray-400"
-                        value={newMessage} onChange={(event : ChangeEvent<HTMLInputElement> ) => setNewMessage(event.target.value)}
-                    />
+                    <textarea rows={1} placeholder="Write your message" style={{ width: '95%' }} className="resize-none bg-secondery rounded-full px-4 p-2 shadow-md border-t border-gray-400"
+                        value={newMessage} onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setNewMessage(event.target.value)}
+                    >
+                    </textarea>
 
                     <button type="submit" className="text-white shrink-0 p-2 border-t border-gray-400 rounded-full bg-green-200 mt-1 mx-2 shadow-md" disabled={loading}>
-                        {loading ? <div className="loader"></div> : <LuSendHorizonal  className="text-xl flex text-blue-600 "/>}
+                        {loading ? <div className="loader"></div> : <LuSendHorizonal className="text-xl flex text-blue-600 " />}
                     </button>
 
                 </div>
