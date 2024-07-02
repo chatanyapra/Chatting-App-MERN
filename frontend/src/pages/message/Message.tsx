@@ -46,10 +46,10 @@ export default function Message() {
     useEffect(() => {
         if (windowSize.width <= 768 && selectedConversation !== null) {
             setVisibilityChat(true);
-            console.log(visibilityChat, " value");
+            // console.log(visibilityChat, " value");
         }else{
             setVisibilityChat(false);
-            console.log(visibilityChat,"value");
+            // console.log(visibilityChat,"value");
         }
     },[selectedConversation])
 
@@ -70,7 +70,7 @@ export default function Message() {
                             <div className="flex mt-2 items-center justify-between">
 
                                 <h2 className={`text-2xl font-bold text-black ml-1 ${textColor === "" ? (darkMode ? 'text-white' : 'text-black') : textColor}`}> Chats </h2>
-
+                                
                             </div>
 
                         </div>

@@ -3,6 +3,8 @@ import { FormEvent, ChangeEvent, useState } from 'react';
 import './components.css';
 import { LuSendHorizonal} from "react-icons/lu";
 import useSendMessage from '../hooks/useSendMessage';
+import useGetMessages from '../hooks/useGetMessages';
+import MessageText from './MessageText';
 // import { useContext } from 'react';
 // import { ThemeContext } from '../context/theme';
 interface Conversation {
@@ -19,6 +21,9 @@ const MessageBox: React.FC<MyComponentProps> = ({conversation, visibility } : My
 
     const [newMessage, setNewMessage] = useState('');
     const {loading, sendMessage} = useSendMessage();
+    const {messages} = useGetMessages();
+    console.log(messages);
+    
 
     const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -34,11 +39,6 @@ const MessageBox: React.FC<MyComponentProps> = ({conversation, visibility } : My
             <div className="flex items-center justify-between gap-2 px-6 z-10 border-b dark:border-slate-700 uk-animation-slide-top-medium">
 
                 <div className="flex items-center sm:gap-4 gap-2 md:py-4 py-2">
-
-                    {/* <!-- toggle for mobile --> */}
-                    <button type="button" className="md:hidden" uk-toggle="target: #side-chat ; cls: max-md:-translate-x-full">
-                        {/* <ion-icon name="chevron-back-outline" className="text-2xl -ml-4"></ion-icon> */}
-                    </button>
 
                     <div className="relative cursor-pointer max-md:hidden">
                         <img src={conversation.profilePic} alt="" className="w-8 h-8 rounded-full shadow" />
@@ -74,132 +74,8 @@ const MessageBox: React.FC<MyComponentProps> = ({conversation, visibility } : My
             {/* <!-- chats bubble --> */}
             <div className="small-scroll w-full p-5 py-10 overflow-y-auto md:h-[calc(100vh-260px)] h-[calc(100vh-195px)]">
 
-                <div  className="py-10 text-center text-sm lg:pt-8">
-                    <img src={conversation.profilePic} className="w-24 h-24 rounded-full mx-auto mb-3" alt="" />
-                    <div className="mt-8">
-                        <div className="md:text-xl text-base font-medium text-black dark:text-white"> {conversation.fullname} </div>
-                        <div className="text-gray-500 text-sm   dark:text-white/80"> {conversation.username} </div>
-                    </div>
-                    <div className="mt-3.5">
-                        <a href="timeline.html" className="inline-block rounded-lg px-4 py-1.5 text-sm font-semibold bg-secondery">View profile</a>
-                    </div>
-                </div>
-
                 <div className="text-sm font-medium space-y-6">
-
-                    {/* <!-- received --> */}
-                    <div className="flex gap-3">
-                        <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="" className="w-9 h-9 rounded-full shadow" />
-                        <div className="px-4 py-2 rounded-[20px] max-w-sm bg-secondery"> Hi, I’m John </div>
-                    </div>
-
-                    {/* <!-- sent --> */}
-                    <div className="flex gap-2 flex-row-reverse items-end">
-                        <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="" className="w-5 h-5 rounded-full shadow" />
-                        <div className="px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow">  I’m Lisa. welcome John</div>
-                    </div>
-
-                    {/* <!-- time --> */}
-                    <div className="flex justify-center ">
-                        <div className="font-medium text-gray-500 text-sm dark:text-white/70">
-                            April 8,2023,6:30 AM
-                        </div>
-                    </div>
-
-                    {/* <!-- received --> */}
-                    <div className="flex gap-3">
-                        <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="" className="w-9 h-9 rounded-full shadow" />
-                        <div className="px-4 py-2 rounded-[20px] max-w-sm bg-secondery">  I’m selling a photo of a sunset. It’s a print on canvas, signed by the photographer. Do you like it? 😊 </div>
-                    </div>
-
-                    {/* <!-- sent --> */}
-                    <div className="flex gap-2 flex-row-reverse items-end">
-                        <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="" className="w-4 h-4 rounded-full shadow" />
-                        <div className="px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow">  Wow, it’s beautiful. How much ? 😍 </div>
-                    </div>
-
-                    {/* <!-- sent media--> */}
-                    <div className="flex gap-2 flex-row-reverse items-end">
-                        <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="" className="w-4 h-4 rounded-full shadow" />
-
-                        <a className="block rounded-[18px] border overflow-hidden" href="#">
-                            <div className="max-w-md">
-                                <div className="max-w-full relative w-72">
-                                    <div className="relative" style={{ paddingBottom: "57.4286%" }}>
-                                        <div className="w-full h-full absolute inset-0">
-                                            <img src="https://picsum.photos/200/300?random=55" alt="" className="block max-w-full max-h-52 w-full h-full object-cover" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-
-                    </div>
-
-                    {/* <!-- time --> */}
-                    <div className="flex justify-center ">
-                        <div className="font-medium text-gray-500 text-sm dark:text-white/70">
-                            April 8,2023,6:30 AM
-                        </div>
-                    </div>
-
-
-                    {/* <!-- received --> */}
-                    <div className="flex gap-3">
-                        <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="" className="w-9 h-9 rounded-full shadow" />
-                        <div className="px-4 py-2 rounded-[20px] max-w-sm bg-secondery"> I’m glad you like it. I’m asking for $200 🤑</div>
-                    </div>
-
-                    {/* <!-- sent --> */}
-                    <div className="flex gap-2 flex-row-reverse items-end">
-                        <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="" className="w-5 h-5 rounded-full shadow" />
-                        <div className="px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow"> $200? Too steep. Can you lower the price a bit? 😕</div>
-                    </div>
-
-                    {/* <!-- received --> */}
-                    <div className="flex gap-3">
-                        <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="" className="w-9 h-9 rounded-full shadow" />
-                        <div className="px-4 py-2 rounded-[20px] max-w-sm bg-secondery"> Well, I can’t go too low because I paid a lot. But I’m willing to negotiate. What’s your offer? 🤔 </div>
-
-                    </div>
-
-                    {/* <!-- sent -->  */}
-                    <div className="flex gap-2 flex-row-reverse items-end">
-                        <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="" className="w-5 h-5 rounded-full shadow" />
-                        <div className="px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow"> Sorry, can’t pay more than $150. 😅</div>
-                    </div>
-
-                    {/* <!-- time --> */}
-                    <div className="flex justify-center ">
-                        <div className="font-medium text-gray-500 text-sm dark:text-white/70">
-                            April 8,2023,6:30 AM
-                        </div>
-                    </div>
-
-                    {/* <!-- received --> */}
-                    <div className="flex gap-3">
-                        <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="" className="w-9 h-9 rounded-full shadow" />
-                        <div className="px-4 py-2 rounded-[20px] max-w-sm bg-secondery"> $150? Too low. Photo worth more.  😬</div>
-                    </div>
-
-                    {/* <!-- sent --> */}
-                    <div className="flex gap-2 flex-row-reverse items-end">
-                        <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="" className="w-5 h-5 rounded-full shadow" />
-                        <div className="px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow"> Too high. I Can’t . How about $160? Final offer. 😬 </div>
-                    </div>
-
-                    {/* <!-- received --> */}
-                    <div className="flex gap-3">
-                        <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="" className="w-9 h-9 rounded-full shadow"/>
-                        <div className="px-4 py-2 rounded-[20px] max-w-sm bg-secondery"> Fine, fine. You’re hard to please. I’ll take $160, but only because I like you. 😍</div>
-                    </div>
-
-                    {/* <!-- sent --> */}
-                    <div className="flex gap-2 flex-row-reverse items-end">
-                        <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="" className="w-5 h-5 rounded-full shadow" />
-                        <div className="px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow"> Great, thank you. I appreciate it. I love this photo and can’t wait to hang it. 😩 </div>
-                    </div>
-
+                    <MessageText/>
                 </div>
 
             </div>

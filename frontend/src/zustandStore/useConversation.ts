@@ -7,23 +7,25 @@ interface Conversation {
     username: string;
 }
 
-interface Message {
+interface MessageType {
   _id: string;
   message: string;
+  senderId: string;
+  receiverId: string;
 }
 
 interface ConversationState {
   selectedConversation: Conversation | null;
   setSelectedConversation: (selectedConversation: Conversation | null) => void;
-  message: Message[];
-  setMessage: (message: Message[]) => void;
+  messages: MessageType[];
+  setMessages: (messages: MessageType[]) => void;
 }
 
 const useConversation = create<ConversationState>((set) => ({
   selectedConversation: null,
-  setSelectedConversation: (selectedConversation :Conversation | null) => set({ selectedConversation }),
-  message: [],
-  setMessage: (message : Message[]) => set({ message })
+  setSelectedConversation: (selectedConversation: Conversation | null) => set({ selectedConversation }),
+  messages: [],
+  setMessages: (messages: MessageType[]) => set({ messages })
 }));
 
 export default useConversation;

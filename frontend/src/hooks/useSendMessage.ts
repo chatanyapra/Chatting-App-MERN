@@ -5,7 +5,7 @@ import useConversation from '../zustandStore/useConversation';
 
 const useSendMessage = () => {
     const [loading, setLoading] = useState<boolean>(false);
-    const {message, setMessage, selectedConversation} = useConversation();
+    const {messages, setMessages, selectedConversation} = useConversation();
 
     const sendMessage = async (usermessage : string) => {
         setLoading(true);
@@ -20,7 +20,7 @@ const useSendMessage = () => {
             if(data.error){
                 throw new Error(data.error);
             }
-            setMessage([...message, data])
+            setMessages([...messages, data])
 
         } catch (error: any) {
             toast.error(error.message);
