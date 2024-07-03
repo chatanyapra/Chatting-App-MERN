@@ -7,6 +7,7 @@ interface MessageType {
   message: string;
   senderId: string;
   receiverId: string;
+  createdAt: string;
 }
 
 interface UseGetMessagesReturn {
@@ -27,8 +28,7 @@ const useGetMessages = (): UseGetMessagesReturn => {
 
         if (data.error) {
           throw new Error(data.error);
-        }
-
+        }        
         setMessages(data);
       } catch (error: any) {
         toast.error(error.message);

@@ -12,6 +12,7 @@ interface MessageType {
   message: string;
   senderId: string;
   receiverId: string;
+  createdAt: string;
 }
 
 interface ConversationState {

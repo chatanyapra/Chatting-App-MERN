@@ -25,7 +25,7 @@ const useGetConversation = (): UseGetConversation => {
                 if (data.error) {
                     throw new Error(data.error);
                 }
-                // console.log(data);
+                console.log(data);
                 
                 setConversations(data as Conversation[]); // Ensure data is cast to Conversation[]
 

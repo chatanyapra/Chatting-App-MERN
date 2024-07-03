@@ -1,15 +1,23 @@
 import useGetMessages from "../hooks/useGetMessages";
+import { groupMessagesByDate } from "../utils/extractTime.ts";
 import MessageTextSmall from "./MessageTextSmall";
+import { formatDate } from "../utils/extractTime.ts"
 
 interface MessageType {
   _id: string;
   message: string;
   senderId: string;
   receiverId: string;
+  createdAt: string;
+}
+interface GroupedMessages {
+  date: string;
+  messages: MessageType[];
 }
 
 function MessageText() {
   const { loading, messages } = useGetMessages();
+  const groupedMessages = groupMessagesByDate(messages);
 
   return (
     <div>
@@ -25,8 +33,19 @@ function MessageText() {
           <p className="text-center text-gray-500">Send a message to start the conversation</p>
         )}
         {!loading && messages && messages.length > 0 && (
-          messages.map((message: MessageType) => (
-            <MessageTextSmall key={message._id} message={message} />
+          groupedMessages.map((group : GroupedMessages) => (
+            <div key={group.date}>
+              <div className="text-center text-gray-500 my-2">
+                <small className='bg-blue-100 py-2 px-3 rounded-md'>
+                {formatDate(group.date)}
+                </small>
+              </div>
+              {group.messages.map((message: MessageType) => (
+                <div key={message._id} >
+                  <MessageTextSmall message={message} />
+                </div>
+              ))}
+            </div>
           ))
         )}
       </div>
