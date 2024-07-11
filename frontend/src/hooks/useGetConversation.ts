@@ -3,7 +3,9 @@ import toast from "react-hot-toast";
 
 interface Conversation {
     _id: string;
-    // Define other properties of the conversation object if needed
+    fullname: string;
+    profilePic: string;
+    username: string;
 }
 
 interface UseGetConversation {

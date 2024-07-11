@@ -20,7 +20,6 @@ const MessageTextSmall: React.FC<MessageTextSmallProps> = ({ message }: MessageT
   const chatClassName = fromMe ? "justify-end" : "justify-start";
   const bgColor = fromMe ? "bg-cyan-200" : "bg-slate-50";
   const formattedTime = formatTime(message.createdAt);
-  // console.log(dateCheck, " ", formattedTime, " ", message.createdAt);
   
 
   return (

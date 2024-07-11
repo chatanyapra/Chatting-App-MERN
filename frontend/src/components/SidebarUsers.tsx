@@ -9,23 +9,6 @@ interface Conversation {
 }
 
 function SidebarUsers({ conversation }: { conversation: Conversation }) {
-    // const [windowSize, setWindowSize] = useState({
-    //     width: window.innerWidth,
-    //     height: window.innerHeight
-    // });
-
-    // useEffect(() => {
-    //     // Handler to call on window resize
-    //     const handleResize = () => {
-    //         setWindowSize({
-    //             width: window.innerWidth,
-    //             height: window.innerHeight
-    //         });
-    //     };
-    //     window.addEventListener('resize', handleResize);
-    //     handleResize();
-    //     return () => window.removeEventListener('resize', handleResize);
-    // }, []);
 
     const {selectedConversation, setSelectedConversation} = useConversation();
     const isSelected = selectedConversation?._id === conversation._id;
