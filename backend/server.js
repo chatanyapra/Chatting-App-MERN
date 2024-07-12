@@ -5,23 +5,20 @@ import connectMongoose from "./dbConnection/dbConnection.js";
 import authRoutes from "./routes/authRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import { app, server } from "./socket/socket.js";
 
-const app = express();
 const port = process.env.PORT || 5001;
 
 dotenv.config();
 
 app.use(cookieParser());
 app.use(express.json());
-// app.get("/", (req, res) => {
-//     res.send("Hello World!");
-// })
 
 app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);
 app.use("/api/users/", userRoutes);
 
-app.listen(port, () => {
+server.listen(port, () => {
     connectMongoose();
     console.log(`Server running on port ${port}`);
 })
