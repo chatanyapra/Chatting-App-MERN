@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuthContext } from "../context/AuthContext";
 import { formatTime } from "../utils/extractTime.ts"
+// import useConversation from '../zustandStore/useConversation.ts';
 
 interface MessageType {
   shouldShake ?: boolean;
@@ -17,6 +18,13 @@ interface MessageTextSmallProps {
 
 const MessageTextSmall: React.FC<MessageTextSmallProps> = ({ message }: MessageTextSmallProps) => {
   const { authUser } = useAuthContext();
+  // const {selectedConversation} = useConversation();
+  // const isSelected = selectedConversation?._id === message._id;
+  // console.log('messanger id: - ',message._id);
+  // console.log('selected: - ',selectedConversation?._id);
+  // console.log('senderId: - ',message.senderId);
+  // console.log('receivId: - ',message.receiverId);
+  
   const fromMe = message.senderId === authUser._id;
   const chatClassName = fromMe ? "justify-end" : "justify-start";
   const bgColor = fromMe ? "bg-cyan-200" : "bg-slate-50";

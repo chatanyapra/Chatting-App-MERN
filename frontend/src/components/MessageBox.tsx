@@ -6,6 +6,7 @@ import useSendMessage from '../hooks/useSendMessage';
 import MessageText from './MessageText';
 import { useEffect, useRef } from 'react';
 import useGetMessages from "../hooks/useGetMessages";
+import { useSocketContext } from '../context/SocketContext';
 // import { useContext } from 'react';
 // import { ThemeContext } from '../context/theme';
 interface Conversation {
@@ -23,6 +24,8 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
     const [newMessage, setNewMessage] = useState('');
     const { loading, sendMessage } = useSendMessage();
     const { messages } = useGetMessages();
+    const {onlineUsers} = useSocketContext();
+    const isOnline = onlineUsers.includes(conversation._id);
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -49,11 +52,11 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
 
                     <div className="relative cursor-pointer max-md:hidden">
                         <img src={conversation.profilePic} alt="" className="w-8 h-8 rounded-full shadow" />
-                        <div className="w-2 h-2 bg-teal-500 rounded-full absolute right-0 bottom-0 m-px"></div>
+                        {isOnline && (<div className="w-2 h-2 bg-teal-500 rounded-full absolute right-0 bottom-0 m-px"></div>)}
                     </div>
                     <div className="cursor-pointer">
                         <div className="text-base font-bold">{conversation.fullname}</div>
-                        <div className="text-xs text-green-500 font-semibold"> Online</div>
+                        <div className="text-xs text-green-500 font-semibold h-3"> {isOnline ? 'Online' : ''}</div>
                     </div>
 
                 </div>
