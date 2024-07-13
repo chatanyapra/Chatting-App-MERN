@@ -3,7 +3,10 @@ import { useAuthContext } from "./AuthContext";
 import { io, Socket } from "socket.io-client";
 
 interface SocketContextValue {
+    socket: Socket | null;
+    onlineUsers: string[];
 }
+
 interface SocketContextProviderProps {
     children: ReactNode;
 }
@@ -13,7 +16,7 @@ const SocketContext = createContext<SocketContextValue | undefined>(undefined);
 export const useSocketContext = () => {
     const context = useContext(SocketContext);
     if (context === undefined) {
-        throw new Error('useAuthContext must be used within an AuthContextProvider');
+        throw new Error('useSocketContext must be used within a SocketContextProvider');
     }
     return context;
 };
@@ -32,10 +35,9 @@ export const SocketContextProvider = ({ children }: SocketContextProviderProps) 
             });
             console.log(socketnew);
             setSocket(socketnew);
-            // -----------------
-            socketnew.on("getOnlineUsers",(users: SetStateAction<string[]>) => {
-                setOnlineUsers(users)
-            })
+            socketnew.on("getOnlineUsers", (users: SetStateAction<string[]>) => {
+                setOnlineUsers(users);
+            });
             return () => {
                 socketnew.close();
             };
@@ -46,7 +48,7 @@ export const SocketContextProvider = ({ children }: SocketContextProviderProps) 
             }
         }
         
-    }, []);
+    }, [authUser]);
 
     return (
         <SocketContext.Provider value={{ socket, onlineUsers }}>

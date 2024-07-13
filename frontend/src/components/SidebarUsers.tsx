@@ -1,5 +1,6 @@
 // import { useNavigate } from "react-router-dom";
 // import { useState, useEffect } from 'react';
+import { useSocketContext } from "../context/SocketContext";
 import useConversation from "../zustandStore/useConversation";
 interface Conversation {
     _id: string;
@@ -12,6 +13,8 @@ function SidebarUsers({ conversation }: { conversation: Conversation }) {
 
     const {selectedConversation, setSelectedConversation} = useConversation();
     const isSelected = selectedConversation?._id === conversation._id;
+    const {onlineUsers} = useSocketContext();
+    const isOnline = onlineUsers.includes(conversation._id);
 
     return (
         <div className={`md:w-80 w-full relative flex items-center gap-4 p-2 ${ isSelected ? 'bg-gray-100' : "" } duration-200 rounded-xl hover:bg-secondery cursor-pointer`}
@@ -19,7 +22,9 @@ function SidebarUsers({ conversation }: { conversation: Conversation }) {
         >
             <div className="relative w-14 h-14 shrink-0">
                 <img src={conversation.profilePic} alt="" className="object-cover w-full h-full rounded-full" />
-                <div className="w-4 h-4 absolute bottom-0 right-0  bg-green-500 rounded-full border border-white dark:border-slate-800"></div>
+                {isOnline && (
+                    <div className="w-4 h-4 absolute bottom-0 right-0  bg-green-500 rounded-full border border-white dark:border-slate-800"></div>
+                )}
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1.5">

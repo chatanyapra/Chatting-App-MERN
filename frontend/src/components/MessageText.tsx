@@ -2,6 +2,7 @@ import useGetMessages from "../hooks/useGetMessages";
 import { groupMessagesByDate } from "../utils/extractTime.ts";
 import MessageTextSmall from "./MessageTextSmall";
 import { formatDate } from "../utils/extractTime.ts"
+import useListenMessage from "../hooks/useListenMessage.ts";
 
 interface MessageType {
   _id: string;
@@ -9,6 +10,7 @@ interface MessageType {
   senderId: string;
   receiverId: string;
   createdAt: string;
+  shouldShake?: boolean;
 }
 interface GroupedMessages {
   date: string;
@@ -16,7 +18,8 @@ interface GroupedMessages {
 }
 
 function MessageText() {
-  const { loading, messages } = useGetMessages();
+  const { loading, messages } = useGetMessages(); 
+  useListenMessage();
   const groupedMessages = groupMessagesByDate(messages);
 
   return (

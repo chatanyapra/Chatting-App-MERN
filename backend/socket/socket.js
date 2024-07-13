@@ -11,7 +11,11 @@ const io = new Server(server, {
     }
 });
 
-const userSocketMap = {} //{userid: socket.id}
+let userSocketMap = {} //{userid: socket.id}
+
+export const getReceiverSocketId = (receiverId) => {
+    return (userSocketMap[receiverId]);
+}
 
 io.on("connection", (socket) => {
     const userId= socket.handshake.query.userId;

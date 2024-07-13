@@ -203,3 +203,21 @@
     fill: rgb(0, 0, 0);
     font-size: 1.3em;
   }
+
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    10%, 90% { transform: translateX(-3.5px); }
+    20%, 80% { transform: translateX(3.5px); }
+    30%, 50%, 70% { transform: translateX(-3.5px); }
+    40%, 60% { transform: translateX(3.5px); }
+  }
+  
+  /* Apply the shake animation to the div */
+  .shake {
+    display: inline-block;
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  

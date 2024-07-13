@@ -1,6 +1,8 @@
 import asyncHandler from "express-async-handler";
 import Conversation from "../models/conversationModel.js";
 import Message from "../models/messageModel.js"
+import { io } from '../socket/socket.js';
+import { getReceiverSocketId } from "../socket/socket.js";
 
 export const sendMessage = asyncHandler( async(req, res) => {
     try {
@@ -25,6 +27,13 @@ export const sendMessage = asyncHandler( async(req, res) => {
             conversation.messages.push(newMessage._id);
         }
         await Promise.all([conversation.save(), newMessage.save()]);
+        // adding socket io to show live meesages changes---------------
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        // console.log('receiverSocketId:----- ',receiverSocketId);
+        if (receiverSocketId) {
+            //io.to(<socket_id>).emit() used to send event to specific client--------------
+            io.to(receiverSocketId).emit("newMessage", newMessage);
+        }
 
         res.status(201).json(newMessage);
 
