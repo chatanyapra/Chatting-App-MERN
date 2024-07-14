@@ -68,7 +68,7 @@ export default function Message() {
             c.fullname.toLowerCase().startsWith(search.toLowerCase())
         );
         setFilteredConversations(conversationSearch);
-        console.log(conversationSearch);
+        console.log('Con- ',conversations);
     }, [search])
     return (
         <>

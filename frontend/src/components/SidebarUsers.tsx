@@ -1,6 +1,7 @@
 // import { useNavigate } from "react-router-dom";
-// import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSocketContext } from "../context/SocketContext";
+import useListenMessage from "../hooks/useListenMessage";
 import useConversation from "../zustandStore/useConversation";
 interface Conversation {
     _id: string;
@@ -15,7 +16,19 @@ function SidebarUsers({ conversation }: { conversation: Conversation }) {
     const isSelected = selectedConversation?._id === conversation._id;
     const {onlineUsers} = useSocketContext();
     const isOnline = onlineUsers.includes(conversation._id);
-
+    const [newSendMessage, setNewSendMessage] = useState<string[]>([]);
+    const { newSendMessage: SendMessage } = useListenMessage(); // Assuming useListenMessage returns an object with newSendMessage
+    console.log('ppp',SendMessage);
+    
+    useEffect(() => {
+        if (SendMessage && SendMessage != '') {
+            if (!newSendMessage.includes(SendMessage)) {
+                setNewSendMessage(prevState => [...prevState, SendMessage]);
+            }
+            console.log('Yes user- ', SendMessage);
+        }
+    }, [SendMessage, newSendMessage]);
+    
     return (
         <div className={`md:w-80 w-full relative flex items-center gap-4 p-2 ${ isSelected ? 'bg-gray-100' : "" } duration-200 rounded-xl hover:bg-secondery cursor-pointer`}
          onClick={()=> setSelectedConversation(conversation)}
