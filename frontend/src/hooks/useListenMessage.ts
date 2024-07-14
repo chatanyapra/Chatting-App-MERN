@@ -1,35 +1,35 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useConversation from "../zustandStore/useConversation";
 import { useSocketContext } from "../context/SocketContext";
-import sound from "../utils/notificationsound.wav";
 import useGetConversation from "./useGetConversation";
 
 const useListenMessage = () => {
     const { messages, setMessages } = useConversation();
     const { conversations } = useGetConversation();
     const { socket } = useSocketContext();
-    let newSendMessage ='';
+    const [newSendMessage, setNewSendMessage] = useState<string>();
 
     useEffect(() => {
         if (!socket) return;
 
-        socket.on("newMessage", (newMessage) => {
-            console.log('NewMes- ', newMessage);
-            const matchedConversation = conversations.find(conv => conv._id === newMessage.senderId);
+        const handleNewMessage = async (newMessage: any) => {
+            // console.log('NewMessage: ', newMessage);
+            const findMatchedConversation = async () => {
+                return conversations.find(conv => conv._id === newMessage.senderId);
+            };
+            const matchedConversation = await findMatchedConversation();
             if (matchedConversation) {
-                newSendMessage = newMessage.senderId;
-                console.log(newSendMessage);
-                
-            }            
-            const notiSound = new Audio(sound);
-            notiSound.play();
+                setNewSendMessage(newMessage.senderId);
+            }
             setMessages([...messages, newMessage]);
-        });
+        };
+
+        socket.on("newMessage", handleNewMessage);
 
         return () => {
-            socket.off("newMessage");
+            socket.off("newMessage", handleNewMessage);
         };
-    }, [socket, messages, setMessages]);
+    }, [socket, conversations, messages, setMessages]);
 
     return { newSendMessage };
 };

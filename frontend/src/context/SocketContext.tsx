@@ -33,7 +33,7 @@ export const SocketContextProvider = ({ children }: SocketContextProviderProps) 
                     userId : authUser._id,
                 }
             });
-            console.log(socketnew);
+            // console.log(socketnew);
             setSocket(socketnew);
             socketnew.on("getOnlineUsers", (users: SetStateAction<string[]>) => {
                 setOnlineUsers(users);

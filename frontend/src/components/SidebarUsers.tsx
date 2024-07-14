@@ -1,5 +1,4 @@
 // import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from 'react';
 import { useSocketContext } from "../context/SocketContext";
 import useListenMessage from "../hooks/useListenMessage";
 import useConversation from "../zustandStore/useConversation";
@@ -16,21 +15,11 @@ function SidebarUsers({ conversation }: { conversation: Conversation }) {
     const isSelected = selectedConversation?._id === conversation._id;
     const {onlineUsers} = useSocketContext();
     const isOnline = onlineUsers.includes(conversation._id);
-    const [newSendMessage, setNewSendMessage] = useState<string[]>([]);
-    const { newSendMessage: SendMessage } = useListenMessage(); // Assuming useListenMessage returns an object with newSendMessage
-    console.log('ppp',SendMessage);
-    
-    useEffect(() => {
-        if (SendMessage && SendMessage != '') {
-            if (!newSendMessage.includes(SendMessage)) {
-                setNewSendMessage(prevState => [...prevState, SendMessage]);
-            }
-            console.log('Yes user- ', SendMessage);
-        }
-    }, [SendMessage, newSendMessage]);
-    
+    const { newSendMessage } = useListenMessage();
+    const messageNotification = conversation._id == newSendMessage ? true : false;
+
     return (
-        <div className={`md:w-80 w-full relative flex items-center gap-4 p-2 ${ isSelected ? 'bg-gray-100' : "" } duration-200 rounded-xl hover:bg-secondery cursor-pointer`}
+        <div className={`md:w-80 w-full relative flex items-center gap-4 p-2 ${ isSelected ? 'bg-gray-100' : "" } duration-200 rounded-xl hover:bg-secondery cursor-pointer relative`}
          onClick={()=> setSelectedConversation(conversation)}
         >
             <div className="relative w-14 h-14 shrink-0">
@@ -48,6 +37,15 @@ function SidebarUsers({ conversation }: { conversation: Conversation }) {
                 </div>
                 <div className="font-medium overflow-hidden text-gray-600 text-ellipsis text-sm whitespace-nowrap">Send the messages...💬</div>
             </div>
+            {messageNotification && (
+                <div className='absolute top-2 right-2'>
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-1 h-1 border border-blue-600 rounded-full wave-effect"></div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

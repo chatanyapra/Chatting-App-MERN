@@ -109,10 +109,10 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
             borderColor={"#e2e8f0"} shouldReturn={false} shouldConvertEmojiToImage={false}          />
           <button
             type="submit"
-            className="text-white shrink-0 p-2 border-t border-gray-400 rounded-full bg-green-200 mt-1 mx-2 shadow-md"
+            className="text-white w-10 h-10 shrink-0 p-2 border-t border-gray-400 rounded-full bg-green-200 mt-1 mx-2 shadow-md text-center"
             disabled={loading}
           >
-            {loading ? <div className="loader"></div> : <LuSendHorizonal className="text-xl flex text-blue-600" />}
+            {loading ? <div className="loader"></div> : <LuSendHorizonal className="text-xl ml-0.5 flex text-blue-600" />}
           </button>
         </div>
       </form>

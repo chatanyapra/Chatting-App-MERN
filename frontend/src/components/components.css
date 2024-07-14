@@ -220,4 +220,22 @@
     backface-visibility: hidden;
     perspective: 1000px;
   }
-  
+  /* wave effect in message--------- */
+  @keyframes wave {
+    0% {
+        border-width: 1px;
+        width: 0px;
+        height: 0px;
+        opacity: 1;
+    }
+    100% {
+        border-width: 13px;
+        width: 10px; /* 12/4 rem */
+        height: 10px; /* 12/4 rem */
+        opacity: 0;
+    }
+}
+
+.wave-effect {
+    animation: wave 1.5s infinite;
+}

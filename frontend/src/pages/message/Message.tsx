@@ -6,6 +6,8 @@ import SidebarUsers from '../../components/SidebarUsers';
 import useGetConversation from '../../hooks/useGetConversation';
 import ChattingStart from '../../components/ChattingStart';
 import useConversation from '../../zustandStore/useConversation';
+import useListenMessage from '../../hooks/useListenMessage';
+import sound from "../../utils/notificationsound.wav";
 
 interface Conversation {
     _id: string;
@@ -63,13 +65,26 @@ export default function Message() {
     };
     useEffect(() => {
         search.length > 0 ? setChangeStyle(false) : setChangeStyle(true);
-        console.log(search);
+        // console.log(search);
         const conversationSearch = conversations.filter((c: Conversation) =>
             c.fullname.toLowerCase().startsWith(search.toLowerCase())
         );
         setFilteredConversations(conversationSearch);
-        console.log('Con- ',conversations);
     }, [search])
+    // --------------------------- check message -----------------------
+    // useListenMessage();
+    const { newSendMessage } = useListenMessage();
+    const [sendMessageList, setSendMessageList] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (newSendMessage) {
+            const messageSenderId = newSendMessage;
+            if (!sendMessageList.includes(messageSenderId)) {
+                setSendMessageList(prevState => [...prevState, messageSenderId]);
+                // console.log('Yes user- ', messageSenderId);
+            }
+        }
+    }, [sendMessageList, newSendMessage]);
     return (
         <>
             <div className='absolute right-5 top-5 text-white border border-blue-600 rounded-md px-2 py-1 bg-blue-500 cursor-pointer'
@@ -111,7 +126,7 @@ export default function Message() {
 
                         <div className="small-scroll space-y-2 p-2 overflow-y-auto md:h-[calc(100vh-204px)] h-[calc(100vh-80px)]">
 
-                                {changeStyle ? 
+                                {newSendMessage || changeStyle ? 
                                 conversations && conversations.map((conversation) => (
                                     <SidebarUsers
                                         key={conversation._id}

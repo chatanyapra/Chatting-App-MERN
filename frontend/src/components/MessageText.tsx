@@ -19,7 +19,6 @@ interface GroupedMessages {
 
 function MessageText() {
   const { loading, messages } = useGetMessages(); 
-  useListenMessage();
   const groupedMessages = groupMessagesByDate(messages);
 
   return (
