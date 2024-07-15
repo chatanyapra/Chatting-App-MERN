@@ -24,3 +24,5 @@ To get a local copy up and running follow these simple steps.
 - Node.js
 - npm (Node Package Manager)
 - MongoDB
+## Auramic Chatting App
+link - https://auramic-chatting.onrender.com
