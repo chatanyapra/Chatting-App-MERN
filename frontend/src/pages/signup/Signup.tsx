@@ -13,7 +13,7 @@ const Signup: React.FC = () => {
     confirmPassword: "",
     gender: ""
   })
-  const {loading, signup} = useSignup();
+  const { signup} = useSignup();
   const handleSubmit = async(event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     await signup(inputs);

@@ -7,7 +7,6 @@ import useGetConversation from '../../hooks/useGetConversation';
 import ChattingStart from '../../components/ChattingStart';
 import useConversation from '../../zustandStore/useConversation';
 import useListenMessage from '../../hooks/useListenMessage';
-import sound from "../../utils/notificationsound.wav";
 
 interface Conversation {
     _id: string;
@@ -21,7 +20,7 @@ export default function Message() {
     let darkMode = false;
 
     const { logout } = useLogout();
-    const { loading, conversations } = useGetConversation();
+    const { conversations } = useGetConversation();
     const { selectedConversation, setSelectedConversation } = useConversation()
     const [visibilityChat, setVisibilityChat] = useState(false)
 

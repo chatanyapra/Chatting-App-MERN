@@ -2,7 +2,6 @@ import useGetMessages from "../hooks/useGetMessages";
 import { groupMessagesByDate } from "../utils/extractTime.ts";
 import MessageTextSmall from "./MessageTextSmall";
 import { formatDate } from "../utils/extractTime.ts"
-import useListenMessage from "../hooks/useListenMessage.ts";
 
 interface MessageType {
   _id: string;
