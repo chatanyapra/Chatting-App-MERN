@@ -21,7 +21,7 @@ const useGetConversation = (): UseGetConversation => {
         const getConversations = async () => {
             setLoading(true);
             try {
-                const res = await fetch("/api/users");
+                const res = await fetch(`${window.location.origin}/api/users`);
                 const data = await res.json();
 
                 if (data.error) {

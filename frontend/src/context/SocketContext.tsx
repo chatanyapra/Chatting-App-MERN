@@ -28,7 +28,7 @@ export const SocketContextProvider = ({ children }: SocketContextProviderProps) 
 
     useEffect(() => {
         if (authUser) {
-            const socketnew = io("https://auramic-chatting.onrender.com", {
+            const socketnew = io(`${window.location.origin}`, {
                 query : {
                     userId : authUser._id,
                 }
