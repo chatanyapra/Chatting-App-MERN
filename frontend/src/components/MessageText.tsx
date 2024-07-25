@@ -2,19 +2,7 @@ import useGetMessages from "../hooks/useGetMessages";
 import { groupMessagesByDate } from "../utils/extractTime.ts";
 import MessageTextSmall from "./MessageTextSmall";
 import { formatDate } from "../utils/extractTime.ts"
-
-interface MessageType {
-  _id: string;
-  message: string;
-  senderId: string;
-  receiverId: string;
-  createdAt: string;
-  shouldShake?: boolean;
-}
-interface GroupedMessages {
-  date: string;
-  messages: MessageType[];
-}
+import {MessageType, GroupedMessages} from "../types/types.ts";
 
 function MessageText() {
   const { loading, messages } = useGetMessages(); 

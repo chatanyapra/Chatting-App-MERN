@@ -1,9 +1,6 @@
 import logoImage from "../assets/auramicimage.png";
 import { useAuthContext } from "../context/AuthContext";
-
-interface MyComponentProps {
-  visibility: boolean;
-}
+import {MyComponentProps} from "../types/types"
 
 const ChattingStart: React.FC<MyComponentProps> = ({ visibility }: MyComponentProps) => {
   const { authUser } = useAuthContext();

@@ -7,13 +7,7 @@ import useGetConversation from '../../hooks/useGetConversation';
 import ChattingStart from '../../components/ChattingStart';
 import useConversation from '../../zustandStore/useConversation';
 import useListenMessage from '../../hooks/useListenMessage';
-
-interface Conversation {
-    _id: string;
-    username: string;
-    fullname: string;
-    profilePic: string;
-}
+import {Conversation} from "../../types/types";
 
 export default function Message() {
     let textColor = 'black';

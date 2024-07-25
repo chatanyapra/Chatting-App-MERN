@@ -1,16 +1,12 @@
-import { createContext, ReactNode, SetStateAction, useEffect, useState, useContext } from "react";
+import { createContext, SetStateAction, useEffect, useState, useContext } from "react";
 import { useAuthContext } from "./AuthContext";
 import { io, Socket } from "socket.io-client";
+import {SocketContextProviderProps} from "../types/types";
 
 interface SocketContextValue {
     socket: Socket | null;
     onlineUsers: string[];
 }
-
-interface SocketContextProviderProps {
-    children: ReactNode;
-}
-
 const SocketContext = createContext<SocketContextValue | undefined>(undefined);
 
 export const useSocketContext = () => {
@@ -28,7 +24,7 @@ export const SocketContextProvider = ({ children }: SocketContextProviderProps) 
 
     useEffect(() => {
         if (authUser) {
-            const socketnew = io(`https://auramic-chatting.onrender.com`, {
+            const socketnew = io(`http://localhost:5001`, {
                 query : {
                     userId : authUser._id,
                 }

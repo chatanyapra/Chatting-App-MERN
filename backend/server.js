@@ -8,7 +8,7 @@ import messageRoutes from "./routes/messageRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import { app, server } from "./socket/socket.js";
 
-const port = process.env.PORT || 5001;
+const port = 5001;
 const __dirname = path.resolve();
 dotenv.config();
 

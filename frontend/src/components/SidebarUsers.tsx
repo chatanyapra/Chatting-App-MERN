@@ -2,12 +2,7 @@
 import { useSocketContext } from "../context/SocketContext";
 import useListenMessage from "../hooks/useListenMessage";
 import useConversation from "../zustandStore/useConversation";
-interface Conversation {
-    _id: string;
-    fullname: string;
-    profilePic: string;
-    username: string;
-}
+import {Conversation} from "../types/types";
 
 function SidebarUsers({ conversation }: { conversation: Conversation }) {
 

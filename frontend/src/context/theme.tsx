@@ -5,7 +5,7 @@ interface ThemeContextProps {
     toggleDarkMode: () => void;
     textColor: string;
     setTextColor: (color: string) => void;
-  }
+}
   
 export const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
 

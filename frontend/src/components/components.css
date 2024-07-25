@@ -239,3 +239,24 @@
 .wave-effect {
     animation: wave 1.5s infinite;
 }
+
+.triangle-right-message {
+	width: 0;
+	height: 0;
+	border-top: 0px solid transparent;
+	border-left: 20px solid rgb(165 243 252);
+	border-bottom: 15px solid transparent;
+  position: absolute;
+  top: 0;
+  right: -15px;
+}
+.triangle-left-message {
+	width: 0;
+	height: 0;
+	border-top: 0px solid transparent;
+	border-right: 25px solid rgb(226 232 240);
+	border-bottom: 15px solid transparent;
+  position: absolute;
+  top: 0;
+  left: -15px;
+}

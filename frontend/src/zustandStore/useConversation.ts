@@ -1,19 +1,6 @@
 import { create } from "zustand";
+import {Conversation, MessageType} from "../types/types"
 
-interface Conversation {
-    _id: string;
-    fullname: string;
-    profilePic: string;
-    username: string;
-}
-
-interface MessageType {
-  _id: string;
-  message: string;
-  senderId: string;
-  receiverId: string;
-  createdAt: string;
-}
 
 interface ConversationState {
   selectedConversation: Conversation | null;

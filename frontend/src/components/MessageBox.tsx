@@ -7,18 +7,7 @@ import MessageText from './MessageText';
 import { useEffect, useRef } from 'react';
 import useGetMessages from "../hooks/useGetMessages";
 import { useSocketContext } from '../context/SocketContext';
-
-interface Conversation {
-  _id: string;
-  fullname: string;
-  profilePic: string;
-  username: string;
-}
-
-interface MyComponentProps {
-  visibility: boolean;
-  conversation: Conversation;
-}
+import {MyComponentProps} from "../types/types";
 
 const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: MyComponentProps) => {
   const [newMessage, setNewMessage] = useState<string>('');
