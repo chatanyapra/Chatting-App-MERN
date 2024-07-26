@@ -9,6 +9,7 @@ function SidebarUsers({ conversation }: { conversation: Conversation }) {
     const {selectedConversation, setSelectedConversation} = useConversation();
     const isSelected = selectedConversation?._id === conversation._id;
     const {onlineUsers} = useSocketContext();
+    
     const isOnline = onlineUsers.includes(conversation._id);
     const { newSendMessage } = useListenMessage();
     const messageNotification = conversation._id == newSendMessage ? true : false;

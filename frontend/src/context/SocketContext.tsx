@@ -1,12 +1,17 @@
-import { createContext, SetStateAction, useEffect, useState, useContext } from "react";
+import { createContext, useEffect, useState, useContext, ReactNode } from "react";
 import { useAuthContext } from "./AuthContext";
 import { io, Socket } from "socket.io-client";
-import {SocketContextProviderProps} from "../types/types";
+import { DefaultEventsMap } from '@socket.io/component-emitter';
 
 interface SocketContextValue {
-    socket: Socket | null;
+    socket: Socket<DefaultEventsMap, DefaultEventsMap> | null;
     onlineUsers: string[];
 }
+
+interface SocketContextProviderProps {
+    children: ReactNode;
+}
+
 const SocketContext = createContext<SocketContextValue | undefined>(undefined);
 
 export const useSocketContext = () => {
@@ -24,14 +29,15 @@ export const SocketContextProvider = ({ children }: SocketContextProviderProps) 
 
     useEffect(() => {
         if (authUser) {
-            const socketnew = io(`http://localhost:5001`, {
-                query : {
-                    userId : authUser._id,
-                }
+            const socketnew = io(`http://localhost:5001`, { // Changed port to 5001
+                query: {
+                    userId: authUser._id,
+                },
             });
-            // console.log(socketnew);
+            console.log("socketnew - ", socketnew);
+
             setSocket(socketnew);
-            socketnew.on("getOnlineUsers", (users: SetStateAction<string[]>) => {
+            socketnew.on("getOnlineUsers", (users: string[]) => {
                 setOnlineUsers(users);
             });
             return () => {
@@ -43,7 +49,6 @@ export const SocketContextProvider = ({ children }: SocketContextProviderProps) 
                 setSocket(null);
             }
         }
-        
     }, [authUser]);
 
     return (

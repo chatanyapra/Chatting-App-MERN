@@ -136,7 +136,7 @@ export default function Message() {
                         </div>
                     </div>
                 </div>
-                {selectedConversation !== null ? <MessageBox conversation={selectedConversation} visibility={visibilityChat} /> : <ChattingStart visibility={false} />}
+                {selectedConversation !== null ? <MessageBox conversation={selectedConversation} visibility={visibilityChat} /> : <ChattingStart />}
             </div>
         </>
     );

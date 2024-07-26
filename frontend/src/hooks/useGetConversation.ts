@@ -1,17 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-
-interface Conversation {
-    _id: string;
-    fullname: string;
-    profilePic: string;
-    username: string;
-}
-
-interface UseGetConversation {
-    loading: boolean;
-    conversations: Conversation[];
-}
+import {UseGetConversation, Conversation } from "../types/types"
 
 const useGetConversation = (): UseGetConversation => {
     const [loading, setLoading] = useState<boolean>(false);

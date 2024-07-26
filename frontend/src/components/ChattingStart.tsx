@@ -1,11 +1,11 @@
 import logoImage from "../assets/auramicimage.png";
 import { useAuthContext } from "../context/AuthContext";
-import {MyComponentProps} from "../types/types"
+// import {MyComponentProps} from "../types/types"
 
-const ChattingStart: React.FC<MyComponentProps> = ({ visibility }: MyComponentProps) => {
+const ChattingStart = () => {
   const { authUser } = useAuthContext();
   return (
-    <div className={`w-full shadow-md bg-white overflow-hidden rounded-xl dark:bg-black max-md:mt-20 max-md:${visibility ? 'visible' : 'hidden'}`}>
+    <div className={`w-full shadow-md bg-white overflow-hidden rounded-xl dark:bg-black max-md:mt-20 max-md:hidden`}>
       <div className="w-full flex justify-between align-middle p-2">
         <div className="flex">
           <img src={authUser.profilePic} className="w-14 h-14" alt="" />

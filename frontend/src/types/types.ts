@@ -1,4 +1,3 @@
-import { ReactNode} from "react";
 
 export interface UserJoinedData {
     email: string;
@@ -28,10 +27,6 @@ export interface UserJoinedData {
     email: string;
     room: string;
   }
-
-export interface SocketContextProviderProps {
-    children: ReactNode;
-}
   
 export interface Conversation {
     _id: string;
@@ -49,6 +44,11 @@ export interface MessageType {
     createdAt: string;
 }
 
+export interface UseGetMessagesReturn {
+  loading: boolean;
+  messages: MessageType[];
+}
+
 export interface MyComponentProps {
     visibility: boolean;
     conversation : Conversation;
@@ -57,6 +57,11 @@ export interface MyComponentProps {
 export interface GroupedMessages {
     date: string;
     messages: MessageType[];
+}
+
+export interface UseGetConversation {
+  loading: boolean;
+  conversations: Conversation[];
 }
 
 export interface MessageTextSmallProps {

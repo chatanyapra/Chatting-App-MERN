@@ -1,19 +1,8 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import useConversation from "../zustandStore/useConversation";
+import { UseGetMessagesReturn } from "../types/types"
 
-interface MessageType {
-  _id: string;
-  message: string;
-  senderId: string;
-  receiverId: string;
-  createdAt: string;
-}
-
-interface UseGetMessagesReturn {
-  loading: boolean;
-  messages: MessageType[];
-}
 
 const useGetMessages = (): UseGetMessagesReturn => {
   const [loading, setLoading] = useState<boolean>(false);
