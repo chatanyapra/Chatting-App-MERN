@@ -119,7 +119,7 @@ const CallingRoom: React.FC = () => {
   ]);
 
   return (
-    <div>
+    <div className="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
       <h1>Room Page</h1>
       <h4>{remoteSocketId ? "Connected" : "No one in room"}</h4>
       {myStream && <button onClick={sendStreams}>Send Stream</button>}
@@ -136,6 +136,36 @@ const CallingRoom: React.FC = () => {
           <ReactPlayer playing height="100px" width="200px" url={remoteStream} />
         </>
       )}
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+        <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold">Video Calling...</h2>
+            <button className="text-gray-500 hover:text-gray-700">
+                <i className="fas fa-times-circle fa-2x"></i>
+            </button>
+        </div>
+        <div className="video-container mb-4">
+            <video autoPlay muted loop>
+                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4"/>
+            </video>
+            <div className="user-video">
+                <video autoPlay muted loop>
+                    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4"/>
+                </video>
+            </div>
+        </div>
+        <div className="text-center mb-4">
+            <h3 className="text-xl font-medium">John Doe</h3>
+            <p className="text-gray-500">Connected</p>
+        </div>
+        <div className="flex justify-center space-x-4">
+            <button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full">
+                <i className="fas fa-phone-alt fa-2x"></i>
+            </button>
+            <button className="bg-red-500 hover:bg-red-600 text-white p-4 rounded-full">
+                <i className="fas fa-phone-slash fa-2x"></i>
+            </button>
+        </div>
+    </div>
     </div>
   );
 };

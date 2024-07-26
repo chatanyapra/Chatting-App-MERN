@@ -8,12 +8,14 @@ import ChattingStart from '../../components/ChattingStart';
 import useConversation from '../../zustandStore/useConversation';
 import useListenMessage from '../../hooks/useListenMessage';
 import {Conversation} from "../../types/types";
+import useCallingHook from '../../hooks/useCallingHook';
 
 export default function Message() {
     let textColor = 'black';
     let darkMode = false;
 
     const { logout } = useLogout();
+    useCallingHook();
     const { conversations } = useGetConversation();
     const { selectedConversation, setSelectedConversation } = useConversation()
     const [visibilityChat, setVisibilityChat] = useState(false)

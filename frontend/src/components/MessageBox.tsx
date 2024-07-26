@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useCallback} from 'react';
 import InputEmoji from 'react-input-emoji';
 import { FormEvent } from 'react';
 import { LuSendHorizonal } from "react-icons/lu";
@@ -8,13 +8,15 @@ import { useEffect, useRef } from 'react';
 import useGetMessages from "../hooks/useGetMessages";
 import { useSocketContext } from '../context/SocketContext';
 import {MyComponentProps} from "../types/types";
+import { useAuthContext } from '../context/AuthContext';
 
 const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: MyComponentProps) => {
   const [newMessage, setNewMessage] = useState<string>('');
   const { loading, sendMessage } = useSendMessage();
   const { messages } = useGetMessages();
-  const { onlineUsers } = useSocketContext();
+  const {socket, onlineUsers } = useSocketContext();
   const isOnline = onlineUsers.includes(conversation._id);
+  const { authUser } = useAuthContext();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -27,6 +29,14 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
     await sendMessage(text);
   };
   
+  const handleVideoCall = useCallback(() => {
+    if(authUser){
+      const userId= conversation._id;
+      const room= authUser._id;
+      socket?.emit("room:join", { email: userId, room });
+    }
+  },[socket]);
+
 
   const lastMessageRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -58,7 +68,7 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
               <path fillRule="evenodd" d="M2 3.5A1.5 1.5 0 013.5 2h1.148a1.5 1.5 0 011.465 1.175l.716 3.223a1.5 1.5 0 01-1.052 1.767l-.933.267c-.41.117-.643.555-.48.95a11.542 11.542 0 006.254 6.254c.395.163.833-.07.95-.48l.267-.933a1.5 1.5 0 011.767-1.052l3.223.716A1.5 1.5 0 0118 15.352V16.5a1.5 1.5 0 01-1.5 1.5H15c-1.149 0-2.263-.15-3.326-.43A13.022 13.022 0 012.43 8.326 13.019 13.019 0 012 5V3.5z" clipRule="evenodd" />
             </svg>
           </button>
-          <button type="button" className="hover:bg-slate-100 p-1.5 rounded-full">
+          <button type="button" className="hover:bg-slate-100 p-1.5 rounded-full" onClick={handleVideoCall}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={`w-6 h-6 ${textColor}`}>
               <path strokeLinecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
             </svg>
