@@ -3,6 +3,10 @@ export interface UserJoinedData {
     email: string;
     id: string;
   }
+export interface UserJoinedDataRequest {
+    email: string;
+    room: string;
+  }
   
   export interface IncommingCallData {
     from: string;

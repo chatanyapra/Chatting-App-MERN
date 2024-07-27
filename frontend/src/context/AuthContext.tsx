@@ -1,6 +1,7 @@
 import React, { createContext, useState, ReactNode, Dispatch, SetStateAction, useContext } from 'react';
 
 interface AuthContextProps {
+    [x: string]: any;
     authUser: any;
     setAuthUser: Dispatch<SetStateAction<any>>;
 }

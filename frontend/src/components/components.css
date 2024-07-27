@@ -264,10 +264,11 @@
 .video-container {
   position: relative;
   width: 100%;
+  max-height: 580px;
   padding-top: 75%; /* Increase the height for 4:3 Aspect Ratio */
   background: #000;
 }
-.video-container video {
+.video-container .videoMainPlayer {
   position: absolute;
   top: 0;
   left: 0;
@@ -283,7 +284,7 @@
   background: #000;
   border: 2px solid #fff;
 }
-.user-video video {
+.user-video .videoplayer {
   width: 100%;
   height: 100%;
 }

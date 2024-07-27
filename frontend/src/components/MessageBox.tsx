@@ -9,6 +9,8 @@ import useGetMessages from "../hooks/useGetMessages";
 import { useSocketContext } from '../context/SocketContext';
 import {MyComponentProps} from "../types/types";
 import { useAuthContext } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+// import openNewRoomWindow from "../callingcomponents/openNewRoomWindow"
 
 const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: MyComponentProps) => {
   const [newMessage, setNewMessage] = useState<string>('');
@@ -17,6 +19,7 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
   const {socket, onlineUsers } = useSocketContext();
   const isOnline = onlineUsers.includes(conversation._id);
   const { authUser } = useAuthContext();
+  const navigate= useNavigate();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -31,9 +34,11 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
   
   const handleVideoCall = useCallback(() => {
     if(authUser){
-      const userId= conversation._id;
-      const room= authUser._id;
-      socket?.emit("room:join", { email: userId, room });
+      const room = conversation._id;
+      const userName= conversation.fullname;
+      socket?.emit("room:join", { email: userName, room });
+      // openNewRoomWindow(room);
+      navigate(`/room/${room}`);
     }
   },[socket]);
 

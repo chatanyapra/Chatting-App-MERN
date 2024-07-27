@@ -34,23 +34,20 @@ io.on("connection", (socket) => {
     }
 
     console.log("A user connected...: ", socket.id);
-    socket.on("disconnect", () => {
-        console.log("User disconnect: ", socket.id);
-        delete userSocketMap[userId];
-        delete emailToSocketIdMap[userId];
-        delete socketidToEmailMap[userId];
-        io.emit("getOnlineUsers", Object.keys(userSocketMap));
-    });
 
     // Uncomment this section if you need the calling functionality
 
     socket.on("room:join", (data) => {
-        console.log("User joinded- ", data);
         const { email, room } = data;
-        emailToSocketIdMap.set(email, socket.id);
-        socketidToEmailMap.set(socket.id, email);
+        // emailToSocketIdMap.set(email, socket.id);
+        // socketidToEmailMap.set(socket.id, email);
         io.to(room).emit("user:joined", { email, id: socket.id });
         socket.join(room);
+        console.log("room- ", room);
+
+        const userSocket = userSocketMap[room];
+        io.to(userSocket).emit("user:request", { email, room });
+
         io.to(socket.id).emit("room:join", data);
     });
 
@@ -70,6 +67,14 @@ io.on("connection", (socket) => {
     socket.on("peer:nego:done", ({ to, ans }) => {
         console.log("peer:nego:done", ans);
         io.to(to).emit("peer:nego:final", { from: socket.id, ans });
+    });
+
+    socket.on("disconnect", () => {
+        console.log("User disconnect: ", socket.id);
+        delete userSocketMap[userId];
+        delete emailToSocketIdMap[userId];
+        delete socketidToEmailMap[userId];
+        io.emit("getOnlineUsers", Object.keys(userSocketMap));
     });
 });
 
