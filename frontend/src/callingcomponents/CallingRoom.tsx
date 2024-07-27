@@ -43,7 +43,7 @@ const CallingRoom: React.FC = () => {
       const ans = await peerService.getAnswer(offer);
       socket?.emit("call:accepted", { to: from, ans });
     },
-    [socket]
+    [socket, peerService]
   );
 
   const sendStreams = useCallback(() => {
@@ -58,9 +58,9 @@ const CallingRoom: React.FC = () => {
     ({ ans }: CallAcceptedData) => {
       peerService.setLocalDescription(ans);
       console.log("Call Accepted!");
-      sendStreams();
+      // sendStreams();
     },
-    [sendStreams]
+    [peerService]
   );
 
   const handleNegoNeeded = useCallback(async () => {
@@ -75,19 +75,19 @@ const CallingRoom: React.FC = () => {
     return () => {
       peerService.peer?.removeEventListener("negotiationneeded", handleNegoNeeded);
     };
-  }, [handleNegoNeeded]);
+  }, [handleNegoNeeded, peerService]);
 
   const handleNegoNeedIncomming = useCallback(
     async ({ from, offer }: NegoNeededData) => {
       const ans = await peerService.getAnswer(offer);
       socket?.emit("peer:nego:done", { to: from, ans });
     },
-    [socket]
+    [socket, peerService]
   );
 
   const handleNegoNeedFinal = useCallback(async ({ ans }: NegoNeedFinalData) => {
     await peerService.setLocalDescription(ans);
-  }, []);
+  }, [peerService]);
 
   useEffect(() => {
     const handleTrack = (ev: RTCTrackEvent) => {
@@ -100,7 +100,7 @@ const CallingRoom: React.FC = () => {
     return () => {
       peerService.peer?.removeEventListener("track", handleTrack);
     };
-  }, []);
+  }, [peerService]);
 
   useEffect(() => {
     socket?.on("user:joined", handleUserJoined);
@@ -118,6 +118,7 @@ const CallingRoom: React.FC = () => {
     };
   }, [
     socket,
+    peerService,
     handleUserJoined,
     handleIncommingCall,
     handleCallAccepted,
@@ -127,23 +128,28 @@ const CallingRoom: React.FC = () => {
 
   // Set srcObject for video elements
   useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleCallUser();
+    }, 1000); 
+
+    return () => clearTimeout(timeoutId);
+  }, [handleCallUser]);
+
+  useEffect(() => {
     if (myStream && myVideoRef.current) {
       myVideoRef.current.srcObject = myStream;
     }
-  }, [myStream]);
-
-  useEffect(() => {
     if (remoteStream && remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = remoteStream;
     }
-  }, [remoteStream]);
+  }, [myStream, remoteStream]);
 
   return (
     <div className="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
       <h1>Room Page</h1>
       <h4>{remoteSocketId ? "Connected" : "No one in room"}</h4>
       {myStream && <button onClick={sendStreams}>Send Stream</button>}
-      {remoteSocketId && <button onClick={handleCallUser}>CALL</button>}
+      {/* {remoteSocketId && <button onClick={handleCallUser}>CALL</button>} */}
       {/* <div>
         {myStream && (
           <>
@@ -171,7 +177,7 @@ const CallingRoom: React.FC = () => {
           )}
           <div className="user-video">
             {myStream && (
-              <video ref={myVideoRef} autoPlay muted className="videoplayer"/>
+              <video ref={myVideoRef} autoPlay muted className="videoplayer" />
             )}
           </div>
         </div>
