@@ -10,7 +10,7 @@ import { useSocketContext } from '../context/SocketContext';
 import {MyComponentProps} from "../types/types";
 import { useAuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-// import openNewRoomWindow from "../callingcomponents/openNewRoomWindow"
+import peerService from "../peerService/peer";
 
 const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: MyComponentProps) => {
   const [newMessage, setNewMessage] = useState<string>('');
@@ -34,10 +34,10 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
   
   const handleVideoCall = useCallback(() => {
     if(authUser){
+      peerService.restartConnection();
       const room = conversation._id;
       const userName= conversation.fullname;
       socket?.emit("room:join", { email: userName, room });
-      // openNewRoomWindow(room);
       navigate(`/room/${room}`);
     }
   },[socket]);

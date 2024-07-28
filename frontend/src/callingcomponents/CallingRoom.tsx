@@ -5,8 +5,10 @@ import "./callingComponent.css";
 import { UserJoinedData, IncommingCallData, CallAcceptedData, NegoNeededData, NegoNeedFinalData } from "../types/types";
 import { useAuthContext } from "../context/AuthContext";
 import { LuPhoneCall, LuPhoneOff  } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
 
 const CallingRoom: React.FC = () => {
+  const navigate = useNavigate();
   const { socket } = useSocketContext();
   const { authUser } = useAuthContext();
   const [remoteSocketId, setRemoteSocketId] = useState<string | null>(null);
@@ -23,7 +25,7 @@ const CallingRoom: React.FC = () => {
     console.log(`Email ${email} joined room`);
     setRemoteSocketId(id);
     setRemoteUserId(userId);
-  }, [setRemoteSocketId]);
+  }, [setRemoteSocketId, setRemoteUserId]);
 
   const handleCallUser = useCallback(async () => {
     if (remoteSocketId) {
@@ -65,14 +67,14 @@ const CallingRoom: React.FC = () => {
   const handleCallAccepted = useCallback(
     ({ ans }: CallAcceptedData) => {
       peerService.setLocalDescription(ans);
-      console.log("remoteSocketId- ", remoteUserId," authUser._id - ", authUser._id);
+      console.log("remoteSocketId- ", remoteSocketId," authUser._id - ", authUser._id);
       
       if(remoteUserId != authUser._id){
-        setSameUser(true);
         sendStreams();
+        setSameUser(true);
       }
     },
-    [peerService, remoteUserId, sendStreams, sameUser, setSameUser]
+    [peerService, remoteUserId, remoteSocketId, sendStreams]
   );
 
   const handleNegoNeeded = useCallback(async () => {
@@ -101,25 +103,28 @@ const CallingRoom: React.FC = () => {
     await peerService.setLocalDescription(ans);
   }, [peerService]);
 
+
+  const handleTrack = useCallback((ev: RTCTrackEvent) => {
+    const remoteStream = ev.streams[0];
+    console.log("GOT TRACKS!!");
+    setRemoteStream(remoteStream);
+  },[setRemoteStream]);
   useEffect(() => {
-    const handleTrack = (ev: RTCTrackEvent) => {
-      const remoteStream = ev.streams[0];
-      console.log("GOT TRACKS!!");
-      setRemoteStream(remoteStream);
-    };
 
     peerService.peer?.addEventListener("track", handleTrack);
     return () => {
       peerService.peer?.removeEventListener("track", handleTrack);
     };
-  }, [peerService]);
+  }, [peerService, handleTrack]);
 
+  
   useEffect(() => {
     socket?.on("user:joined", handleUserJoined);
     socket?.on("incomming:call", handleIncommingCall);
     socket?.on("call:accepted", handleCallAccepted);
     socket?.on("peer:nego:needed", handleNegoNeedIncomming);
     socket?.on("peer:nego:final", handleNegoNeedFinal);
+    socket?.on("call:end", handleCallingEnd);
 
     return () => {
       socket?.off("user:joined", handleUserJoined);
@@ -127,6 +132,7 @@ const CallingRoom: React.FC = () => {
       socket?.off("call:accepted", handleCallAccepted);
       socket?.off("peer:nego:needed", handleNegoNeedIncomming);
       socket?.off("peer:nego:final", handleNegoNeedFinal);
+      socket?.off("call:end", handleCallingEnd);
     };
   }, [
     socket,
@@ -156,29 +162,28 @@ const CallingRoom: React.FC = () => {
     }
   }, [myStream, remoteStream]);
 
+  const handleCallingAcceept = () => {
+    setSameUser(true);
+    sendStreams();
+  }
+  // Call end------------------
+  const handleCallingEnd = () => {
+    peerService.closeConnection();
+    console.log("calend");
+    navigate("/message");
+    window.location.reload();
+  }
+  const handleEndCall = () => {
+    peerService.closeConnection();
+    socket?.emit("call:end", { to: remoteSocketId });
+    navigate("/message");
+    window.location.reload();
+  };
   return (
     <div className="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
-      {/* <h1>Room Page</h1> */}
-      <h4>{remoteSocketId ? "Connected" : "No one in room"}</h4>
-      {/* {myStream && remoteUserId == authUser._id && <button onClick={sendStreams}>Send Stream</button>} */}
-      {/* {remoteSocketId && <button onClick={handleCallUser}>CALL</button>} */}
-      {/* <div>
-        {myStream && (
-          <>
-            <h1>My Stream</h1>
-            <video ref={myVideoRef} autoPlay muted loop />
-          </>
-        )}
-        {remoteStream && (
-          <>
-            <h1>Remote Stream</h1>
-            <video ref={remoteVideoRef} autoPlay loop />
-          </>
-        )}
-      </div> */}
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-semibold">Video Calling...</h2>
+          <h2 className="text-2xl font-semibold">Video Calling</h2>
           <button className="text-gray-500 hover:text-gray-700">
             <i className="fas fa-times-circle fa-2x"></i>
           </button>
@@ -195,17 +200,17 @@ const CallingRoom: React.FC = () => {
         </div>
         <div className="text-center mb-4">
           <h3 className="text-xl font-medium">John Doe</h3>
-          <p className="text-gray-500">Connected</p>
+          <p className="text-gray-500">{remoteSocketId ? "Connected" : "Connecting..."}</p>
         </div>
         <div className="flex justify-center space-x-4">
           {myStream && (
             <>
-              {sameUser && (
-                <button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full" onClick={sendStreams}>
+              {!sameUser && (
+                <button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full" onClick={handleCallingAcceept}>
                   <LuPhoneCall className="text-2xl"/>
                 </button>
               )}
-              <button className="bg-red-500 hover:bg-red-600 text-white p-4 rounded-full">
+              <button className="bg-red-500 hover:bg-red-600 text-white p-4 rounded-full" onClick={handleEndCall}>
                 <LuPhoneOff className="text-2xl"/>
               </button>
             </>

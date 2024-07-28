@@ -29,7 +29,11 @@ class PeerService {
 
   async setLocalDescription(ans: RTCSessionDescriptionInit): Promise<void> {
     if (this.peer) {
-      await this.peer.setRemoteDescription(ans);
+      try {
+        await this.peer.setRemoteDescription(ans);
+      } catch (error) {
+        console.error("Error in setLocalDescription:", error);
+      }
     }
   }
 
@@ -38,6 +42,29 @@ class PeerService {
       const offer = await this.peer.createOffer();
       await this.peer.setLocalDescription(offer);
       return offer;
+    }
+  }
+
+  closeConnection(): void {
+    if (this.peer) {
+      // Close all tracks of each stream
+      this.peer.getSenders().forEach(sender => sender.track?.stop());
+      this.peer.getReceivers().forEach(receiver => receiver.track?.stop());
+      
+      // Close the peer connection
+      this.peer.close();
+      this.peer = null;
+    }
+  }
+
+  isConnectionActive(): boolean {
+    return this.peer?.iceConnectionState === "connected" || this.peer?.iceConnectionState === "completed";
+  }
+
+  restartConnection() {
+    if (!this.isConnectionActive()) {
+      this.closeConnection();
+      this.peer = this.createPeerConnection();
     }
   }
 }

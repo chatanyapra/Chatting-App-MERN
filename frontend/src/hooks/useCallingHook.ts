@@ -25,20 +25,20 @@ const useCallingHook = () => {
   //   },
   //   []
   // );
-  const handleUserJoined = useCallback((data: UserJoinedDataRequest) => {
+  const handleUserJoined = useCallback(async(data: UserJoinedDataRequest) => {
     console.log("User connecting");
     const { email, room} = data;
-    let userroom= room
-    if(userroom == null){
+    let userroom = room
+    if(room === null || room === undefined || room === ""){
       userroom = authUser._id;
     }
     console.log("User joined-- ",email, userroom);
 
     socket?.emit("room:join", { email, room : userroom });
 
-      navigate(`/room/${userroom}`);
+    navigate(`/room/${userroom}`);
 
-  },[socket, navigate]);
+  },[socket]);
 
   useEffect(() => {
     socket?.on("user:request", handleUserJoined);

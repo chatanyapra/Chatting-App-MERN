@@ -12,10 +12,6 @@ const io = new Server(server, {
     }
 });
 
-
-const emailToSocketIdMap = new Map();
-const socketidToEmailMap = new Map();
-
 let userSocketMap = {}; // {userid: socket.id}
 
 export const getReceiverSocketId = (receiverId) => {
@@ -39,8 +35,6 @@ io.on("connection", (socket) => {
 
     socket.on("room:join", (data) => {
         const { email, room } = data;
-        // emailToSocketIdMap.set(email, socket.id);
-        // socketidToEmailMap.set(socket.id, email);
         io.to(room).emit("user:joined", { email, id: socket.id, userId: room });
         socket.join(room);
         console.log("room- ", room);
@@ -69,11 +63,14 @@ io.on("connection", (socket) => {
         io.to(to).emit("peer:nego:final", { from: socket.id, ans });
     });
 
+    socket.on('call:end', ({ to }) => {
+        socket.to(to).emit('call:end');
+        console.log("new disconnect--------------");
+    });
+
     socket.on("disconnect", () => {
         console.log("User disconnect: ", socket.id);
         delete userSocketMap[userId];
-        delete emailToSocketIdMap[userId];
-        delete socketidToEmailMap[userId];
         io.emit("getOnlineUsers", Object.keys(userSocketMap));
     });
 });
