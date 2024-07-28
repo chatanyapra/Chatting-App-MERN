@@ -2,6 +2,7 @@
 export interface UserJoinedData {
     email: string;
     id: string;
+    userId: string;
   }
 export interface UserJoinedDataRequest {
     email: string;

@@ -3,10 +3,15 @@ import peerService from "../peerService/peer";
 import { useSocketContext } from "../context/SocketContext";
 import "./callingComponent.css";
 import { UserJoinedData, IncommingCallData, CallAcceptedData, NegoNeededData, NegoNeedFinalData } from "../types/types";
+import { useAuthContext } from "../context/AuthContext";
+import { LuPhoneCall, LuPhoneOff  } from "react-icons/lu";
 
 const CallingRoom: React.FC = () => {
   const { socket } = useSocketContext();
+  const { authUser } = useAuthContext();
   const [remoteSocketId, setRemoteSocketId] = useState<string | null>(null);
+  const [remoteUserId, setRemoteUserId] = useState<string | null>(null);
+  const [sameUser, setSameUser] = useState<boolean>(false);
   const [myStream, setMyStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
 
@@ -14,10 +19,11 @@ const CallingRoom: React.FC = () => {
   const myVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
 
-  const handleUserJoined = useCallback(({ email, id }: UserJoinedData) => {
+  const handleUserJoined = useCallback(({ email, id, userId }: UserJoinedData) => {
     console.log(`Email ${email} joined room`);
     setRemoteSocketId(id);
-  }, []);
+    setRemoteUserId(userId);
+  }, [setRemoteSocketId]);
 
   const handleCallUser = useCallback(async () => {
     if (remoteSocketId) {
@@ -29,7 +35,7 @@ const CallingRoom: React.FC = () => {
       socket?.emit("user:call", { to: remoteSocketId, offer });
       setMyStream(stream);
     }
-  }, [remoteSocketId, socket]);
+  }, [remoteSocketId, socket, peerService]);
 
   const handleIncommingCall = useCallback(
     async ({ from, offer }: IncommingCallData) => {
@@ -47,20 +53,26 @@ const CallingRoom: React.FC = () => {
   );
 
   const sendStreams = useCallback(() => {
+    console.log("send stream-----------");
+    
     if (myStream && peerService.peer) {
       for (const track of myStream.getTracks()) {
         peerService.peer.addTrack(track, myStream);
       }
     }
-  }, [myStream]);
+  }, [myStream, peerService]);
 
   const handleCallAccepted = useCallback(
     ({ ans }: CallAcceptedData) => {
       peerService.setLocalDescription(ans);
-      console.log("Call Accepted!");
-      // sendStreams();
+      console.log("remoteSocketId- ", remoteUserId," authUser._id - ", authUser._id);
+      
+      if(remoteUserId != authUser._id){
+        setSameUser(true);
+        sendStreams();
+      }
     },
-    [peerService]
+    [peerService, remoteUserId, sendStreams, sameUser, setSameUser]
   );
 
   const handleNegoNeeded = useCallback(async () => {
@@ -146,9 +158,9 @@ const CallingRoom: React.FC = () => {
 
   return (
     <div className="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
-      <h1>Room Page</h1>
+      {/* <h1>Room Page</h1> */}
       <h4>{remoteSocketId ? "Connected" : "No one in room"}</h4>
-      {myStream && <button onClick={sendStreams}>Send Stream</button>}
+      {/* {myStream && remoteUserId == authUser._id && <button onClick={sendStreams}>Send Stream</button>} */}
       {/* {remoteSocketId && <button onClick={handleCallUser}>CALL</button>} */}
       {/* <div>
         {myStream && (
@@ -186,12 +198,18 @@ const CallingRoom: React.FC = () => {
           <p className="text-gray-500">Connected</p>
         </div>
         <div className="flex justify-center space-x-4">
-          <button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full">
-            <i className="fas fa-phone-alt fa-2x"></i>
-          </button>
-          <button className="bg-red-500 hover:bg-red-600 text-white p-4 rounded-full">
-            <i className="fas fa-phone-slash fa-2x"></i>
-          </button>
+          {myStream && (
+            <>
+              {sameUser && (
+                <button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full" onClick={sendStreams}>
+                  <LuPhoneCall className="text-2xl"/>
+                </button>
+              )}
+              <button className="bg-red-500 hover:bg-red-600 text-white p-4 rounded-full">
+                <LuPhoneOff className="text-2xl"/>
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

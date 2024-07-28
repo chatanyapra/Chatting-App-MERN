@@ -2,13 +2,13 @@ import { useCallback, useEffect } from 'react';
 import { useSocketContext } from "../context/SocketContext";
 import { UserJoinedDataRequest } from "../types/types";
 import { useNavigate } from 'react-router-dom';
-// import { useAuthContext } from '../context/AuthContext';
+import { useAuthContext } from '../context/AuthContext';
 
 const useCallingHook = () => {
   const { socket, onlineUsers } = useSocketContext();
   console.log("Online user- ", onlineUsers);
   const navigate = useNavigate();
-  // const authUser = useAuthContext();
+  const authUser = useAuthContext();
 
   // const handleJoinRoom = useCallback(
   //   (data: JoinRoomData) => {
@@ -28,11 +28,15 @@ const useCallingHook = () => {
   const handleUserJoined = useCallback((data: UserJoinedDataRequest) => {
     console.log("User connecting");
     const { email, room} = data;
-    console.log("User joined-- ",email, room);
+    let userroom= room
+    if(userroom == null){
+      userroom = authUser._id;
+    }
+    console.log("User joined-- ",email, userroom);
 
-    socket?.emit("room:join", { email, room });
+    socket?.emit("room:join", { email, room : userroom });
 
-      navigate(`/room/${room}`);
+      navigate(`/room/${userroom}`);
 
   },[socket, navigate]);
 
