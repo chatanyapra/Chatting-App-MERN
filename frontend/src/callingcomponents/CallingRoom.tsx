@@ -51,7 +51,7 @@ const CallingRoom: React.FC = () => {
       const ans = await peerService.getAnswer(offer);
       socket?.emit("call:accepted", { to: from, ans });
     },
-    [socket, peerService]
+    [socket, peerService, setMyStream]
   );
 
   const sendStreams = useCallback(() => {
@@ -62,19 +62,19 @@ const CallingRoom: React.FC = () => {
         peerService.peer.addTrack(track, myStream);
       }
     }
-  }, [myStream, peerService]);
+  }, [myStream, peerService.peer]);
 
   const handleCallAccepted = useCallback(
     ({ ans }: CallAcceptedData) => {
       peerService.setLocalDescription(ans);
-      console.log("remoteSocketId- ", remoteSocketId," authUser._id - ", authUser._id);
+      console.log("remoteUserId - ", remoteUserId," authUser._id - ", authUser._id);
       
       if(remoteUserId != authUser._id){
         sendStreams();
         setSameUser(true);
       }
     },
-    [peerService, remoteUserId, remoteSocketId, sendStreams]
+    [peerService, remoteUserId, remoteSocketId, sendStreams, setSameUser]
   );
 
   const handleNegoNeeded = useCallback(async () => {
@@ -109,6 +109,28 @@ const CallingRoom: React.FC = () => {
     console.log("GOT TRACKS!!");
     setRemoteStream(remoteStream);
   },[setRemoteStream]);
+
+  const handleCallingAccept = useCallback(() => {
+    setSameUser(true);
+    sendStreams();
+  }, [sendStreams, setSameUser]);
+  // Call end------------------
+  const handleCallingEnd = useCallback(() => {
+    peerService.closeConnection();
+    console.log("calend");
+    setSameUser(false);
+    navigate("/message");
+    window.location.reload();
+  }, [navigate, setSameUser]);
+
+  const handleEndCall = useCallback(() => {
+    peerService.closeConnection();
+    setSameUser(false);
+    socket?.emit("call:end", { to: remoteSocketId });
+    navigate("/message");
+    window.location.reload();
+  }, [navigate, remoteSocketId, socket, setSameUser]);
+
   useEffect(() => {
 
     peerService.peer?.addEventListener("track", handleTrack);
@@ -136,7 +158,7 @@ const CallingRoom: React.FC = () => {
     };
   }, [
     socket,
-    peerService,
+    handleCallingEnd,
     handleUserJoined,
     handleIncommingCall,
     handleCallAccepted,
@@ -162,23 +184,7 @@ const CallingRoom: React.FC = () => {
     }
   }, [myStream, remoteStream]);
 
-  const handleCallingAcceept = () => {
-    setSameUser(true);
-    sendStreams();
-  }
-  // Call end------------------
-  const handleCallingEnd = () => {
-    peerService.closeConnection();
-    console.log("calend");
-    navigate("/message");
-    window.location.reload();
-  }
-  const handleEndCall = () => {
-    peerService.closeConnection();
-    socket?.emit("call:end", { to: remoteSocketId });
-    navigate("/message");
-    window.location.reload();
-  };
+
   return (
     <div className="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
@@ -206,7 +212,7 @@ const CallingRoom: React.FC = () => {
           {myStream && (
             <>
               {!sameUser && (
-                <button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full" onClick={handleCallingAcceept}>
+                <button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full" onClick={handleCallingAccept}>
                   <LuPhoneCall className="text-2xl"/>
                 </button>
               )}

@@ -29,8 +29,10 @@ const useCallingHook = () => {
     console.log("User connecting");
     const { email, room} = data;
     let userroom = room
-    if(room === null || room === undefined || room === ""){
+    if(room == null || room == undefined || room == ""){
       userroom = authUser._id;
+      console.log("userroom = authUser._id", userroom);
+      
     }
     console.log("User joined-- ",email, userroom);
 
