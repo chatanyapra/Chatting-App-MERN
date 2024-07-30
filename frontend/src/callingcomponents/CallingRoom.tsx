@@ -66,6 +66,8 @@ const CallingRoom: React.FC = () => {
 
   const handleCallAccepted = useCallback(
     ({ ans }: CallAcceptedData) => {
+      console.log("call:accepted -----= ", ans);
+      
       peerService.setLocalDescription(ans);
       console.log("remoteUserId - ", remoteUserId," authUser._id - ", authUser._id);
       
@@ -100,7 +102,9 @@ const CallingRoom: React.FC = () => {
   );
 
   const handleNegoNeedFinal = useCallback(async ({ ans }: NegoNeedFinalData) => {
+    console.log("final - ",ans);
     await peerService.setLocalDescription(ans);
+    
   }, [peerService]);
 
 
@@ -187,7 +191,7 @@ const CallingRoom: React.FC = () => {
 
   return (
     <div className="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg max-sm:h-screen">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-semibold">Video Calling</h2>
           <button className="text-gray-500 hover:text-gray-700">
@@ -206,7 +210,7 @@ const CallingRoom: React.FC = () => {
         </div>
         <div className="text-center mb-4">
           <h3 className="text-xl font-medium">John Doe</h3>
-          <p className="text-gray-500">{remoteSocketId ? "Connected" : "Connecting..."}</p>
+          {/* <p className="text-gray-500">{remoteSocketId ? "Connected" : "Connecting..."}</p> */}
         </div>
         <div className="flex justify-center space-x-4">
           {myStream && (
