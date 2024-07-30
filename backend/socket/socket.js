@@ -6,7 +6,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: [`https://auramic-chatting.onrender.com`],
+        origin: [`http://localhost:5001`],
         methods: ['GET', 'POST'],
         credentials: true
     }

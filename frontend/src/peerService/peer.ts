@@ -27,7 +27,7 @@ class PeerService {
     }
   }
 
-  async setLocalDescription(ans: RTCSessionDescriptionInit): Promise<void> {
+  async setLocalDesc(ans: RTCSessionDescriptionInit) {
     if (this.peer) {
       try {
         await this.peer.setRemoteDescription(ans);

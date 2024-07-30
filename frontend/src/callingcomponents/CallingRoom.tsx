@@ -64,11 +64,10 @@ const CallingRoom: React.FC = () => {
     }
   }, [myStream, peerService.peer]);
 
-  const handleCallAccepted = useCallback(
-    ({ ans }: CallAcceptedData) => {
+  const handleCallAccepted = useCallback(async({ ans }: CallAcceptedData) => {
       console.log("call:accepted -----= ", ans);
       
-      peerService.setLocalDescription(ans);
+      await peerService.setLocalDesc(ans);
       console.log("remoteUserId - ", remoteUserId," authUser._id - ", authUser._id);
       
       if(remoteUserId != authUser._id){
@@ -103,7 +102,7 @@ const CallingRoom: React.FC = () => {
 
   const handleNegoNeedFinal = useCallback(async ({ ans }: NegoNeedFinalData) => {
     console.log("final - ",ans);
-    await peerService.setLocalDescription(ans);
+    await peerService.setLocalDesc(ans);
     
   }, [peerService]);
 
