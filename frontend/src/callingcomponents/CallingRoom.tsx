@@ -123,7 +123,7 @@ const CallingRoom: React.FC = () => {
     console.log("calend");
     setSameUser(false);
     navigate("/message");
-    window.location.reload();
+    // window.location.reload();
   }, [navigate, setSameUser]);
 
   const handleEndCall = useCallback(() => {
@@ -131,7 +131,7 @@ const CallingRoom: React.FC = () => {
     setSameUser(false);
     socket?.emit("call:end", { to: remoteSocketId });
     navigate("/message");
-    window.location.reload();
+    // window.location.reload();
   }, [navigate, remoteSocketId, socket, setSameUser]);
 
   useEffect(() => {
