@@ -18,6 +18,7 @@ export const getReceiverSocketId = (receiverId) => {
     return userSocketMap[receiverId];
 }
 
+
 io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
     console.log("User connected with userId:", userId);
@@ -34,20 +35,20 @@ io.on("connection", (socket) => {
     // Uncomment this section if you need the calling functionality
 
     socket.on("room:join", (data) => {
-        const { userId, room } = data;
-        io.to(room).emit("user:joined", { id: socket.id, userId: room });
+        const {username, userId, room, video } = data;
+        io.to(room).emit("user:joined", {username, id: socket.id, userId: room, video });
         socket.join(room);
         console.log("room- ", room);
 
         const userSocket = userSocketMap[room];
-        io.to(userSocket).emit("user:request", { userId, room });
+        io.to(userSocket).emit("user:request", {username, userId, room, video });
 
-        io.to(socket.id).emit("room:join", data);
+        // io.to(socket.id).emit("room:join", data);
     });
 
-    socket.on("user:call", ({ to, offer }) => {
-        console.log("user:call - ", to);
-        io.to(to).emit("incomming:call", { from: socket.id, offer });
+    socket.on("user:call", ({username, to, offer, video }) => {
+        console.log("user:call - ", to, " video - ", video);
+        io.to(to).emit("incomming:call", {username, from: socket.id, offer, video });
     });
 
     socket.on("call:accepted", ({ to, ans }) => {
@@ -76,4 +77,5 @@ io.on("connection", (socket) => {
         io.emit("getOnlineUsers", Object.keys(userSocketMap));
     });
 });
+
 export { app, io, server };

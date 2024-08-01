@@ -22,9 +22,10 @@ export const useAuthContext = (): AuthContextProps => {
 
 export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({ children } : AuthContextProviderProps) => {
     const [authUser, setAuthUser] = useState<any>(JSON.parse(localStorage.getItem('auramic-logged-user') || 'null'));
+    const [callingUserName, setCallingUserName] = useState<string>("");
 
     return (
-        <AuthContext.Provider value={{ authUser, setAuthUser }}>
+        <AuthContext.Provider value={{ authUser, setAuthUser, callingUserName, setCallingUserName }}>
             {children}
         </AuthContext.Provider>
     );
