@@ -21,23 +21,29 @@ const CallingRoom: React.FC = () => {
   const myVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
 
-  const handleUserJoined = useCallback(({ email, id, userId }: UserJoinedData) => {
-    console.log(`Email ${email} joined room`);
-    setRemoteSocketId(id);
-    setRemoteUserId(userId);
-  }, [setRemoteSocketId, setRemoteUserId]);
-
-  const handleCallUser = useCallback(async () => {
-    if (remoteSocketId) {
+  
+  const handleCallUser = useCallback(async (id : string) => {
+    if (id) {
+      setRemoteSocketId(id);
+      console.log("if remoteSocketId--", id);
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: true,
       });
       const offer = await peerService.getOffer();
-      socket?.emit("user:call", { to: remoteSocketId, offer });
+      socket?.emit("user:call", { to: id, offer });
       setMyStream(stream);
     }
-  }, [remoteSocketId, socket, peerService]);
+  }, [setRemoteSocketId, socket]);
+
+
+  const handleUserJoined = useCallback(async(data: UserJoinedData) => {
+    const { id, userId } = data;
+    console.log(`setRemoteUserId room (userId) - `, userId, ", setRemoteSocketId - ", id);
+    setRemoteSocketId(id);
+    setRemoteUserId(userId);
+    await handleCallUser(id);
+  }, [setRemoteSocketId, setRemoteUserId, handleCallUser, remoteSocketId]);
 
   const handleIncommingCall = useCallback(
     async ({ from, offer }: IncommingCallData) => {
@@ -51,7 +57,7 @@ const CallingRoom: React.FC = () => {
       const ans = await peerService.getAnswer(offer);
       socket?.emit("call:accepted", { to: from, ans });
     },
-    [socket, peerService, setMyStream]
+    [socket, setMyStream]
   );
 
   const sendStreams = useCallback(() => {
@@ -64,11 +70,11 @@ const CallingRoom: React.FC = () => {
     }
   }, [myStream, peerService.peer]);
 
-  const handleCallAccepted = useCallback(async({ ans }: CallAcceptedData) => {
-      console.log("call:accepted -----= ", ans);
+  const handleCallAccepted = useCallback(async({from, ans }: CallAcceptedData) => {
+      console.log("call:accepted --= ", ans,"from - ", from);
       
       await peerService.setLocalDesc(ans);
-      console.log("remoteUserId - ", remoteUserId," authUser._id - ", authUser._id);
+      console.log("remoteUseriiId - ", remoteUserId," authUser._id - ", authUser._id);
       
       if(remoteUserId != authUser._id){
         sendStreams();
@@ -123,7 +129,7 @@ const CallingRoom: React.FC = () => {
     console.log("calend");
     setSameUser(false);
     navigate("/message");
-    // window.location.reload();
+    window.location.reload();
   }, [navigate, setSameUser]);
 
   const handleEndCall = useCallback(() => {
@@ -131,8 +137,8 @@ const CallingRoom: React.FC = () => {
     setSameUser(false);
     socket?.emit("call:end", { to: remoteSocketId });
     navigate("/message");
-    // window.location.reload();
-  }, [navigate, remoteSocketId, socket, setSameUser]);
+    window.location.reload();
+  }, [navigate, remoteSocketId, socket]);
 
   useEffect(() => {
 
@@ -161,6 +167,7 @@ const CallingRoom: React.FC = () => {
     };
   }, [
     socket,
+    setRemoteSocketId,
     handleCallingEnd,
     handleUserJoined,
     handleIncommingCall,
@@ -168,15 +175,6 @@ const CallingRoom: React.FC = () => {
     handleNegoNeedIncomming,
     handleNegoNeedFinal,
   ]);
-
-  // Set srcObject for video elements
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      handleCallUser();
-    }, 1000); 
-
-    return () => clearTimeout(timeoutId);
-  }, [handleCallUser]);
 
   useEffect(() => {
     if (myStream && myVideoRef.current) {

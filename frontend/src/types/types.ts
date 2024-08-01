@@ -5,7 +5,7 @@ export interface UserJoinedData {
     userId: string;
   }
 export interface UserJoinedDataRequest {
-    email: string;
+    userId: string;
     room: string;
   }
   

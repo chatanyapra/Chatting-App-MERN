@@ -34,22 +34,24 @@ io.on("connection", (socket) => {
     // Uncomment this section if you need the calling functionality
 
     socket.on("room:join", (data) => {
-        const { email, room } = data;
-        io.to(room).emit("user:joined", { email, id: socket.id, userId: room });
+        const { userId, room } = data;
+        io.to(room).emit("user:joined", { id: socket.id, userId: room });
         socket.join(room);
         console.log("room- ", room);
 
         const userSocket = userSocketMap[room];
-        io.to(userSocket).emit("user:request", { email, room });
+        io.to(userSocket).emit("user:request", { userId, room });
 
         io.to(socket.id).emit("room:join", data);
     });
 
     socket.on("user:call", ({ to, offer }) => {
+        console.log("user:call - ", to);
         io.to(to).emit("incomming:call", { from: socket.id, offer });
     });
 
     socket.on("call:accepted", ({ to, ans }) => {
+        console.log("call:accepted - ", to);
         io.to(to).emit("call:accepted", { from: socket.id, ans });
     });
 
@@ -64,8 +66,8 @@ io.on("connection", (socket) => {
     });
 
     socket.on('call:end', ({ to }) => {
-        socket.to(to).emit('call:end');
         console.log("new disconnect--------------");
+        socket.to(to).emit('call:end');
     });
 
     socket.on("disconnect", () => {
@@ -74,5 +76,4 @@ io.on("connection", (socket) => {
         io.emit("getOnlineUsers", Object.keys(userSocketMap));
     });
 });
-
 export { app, io, server };

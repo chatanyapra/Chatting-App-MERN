@@ -36,8 +36,8 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
     if(authUser){
       peerService.restartConnection();
       const room = conversation._id;
-      const userName= conversation.fullname;
-      socket?.emit("room:join", { email: userName, room });
+      const loggedinUserId = authUser._id;
+      socket?.emit("room:join", { userId: loggedinUserId , room });
       navigate(`/room/${room}`);
     }
   },[socket]);
