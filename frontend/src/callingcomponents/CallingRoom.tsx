@@ -7,6 +7,7 @@ import { UserJoinedData, IncommingCallData, CallAcceptedData, NegoNeededData, Ne
 import { useAuthContext } from "../context/AuthContext";
 import { LuPhoneCall, LuPhoneOff } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
+import CallSoundManager from "./CallSoundManager";
 
 const CallingRoom: React.FC = () => {
   const navigate = useNavigate();
@@ -18,11 +19,23 @@ const CallingRoom: React.FC = () => {
   const [sameUser, setSameUser] = useState<boolean>(false);
   const [myStream, setMyStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+  const [isCallSoundPlaying, setIsCallSoundPlaying] = useState(false); // Manage call sound state
 
   // Refs for video elements
   const myVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
+
+  // Calling ringtone----------
+  const playCallSound = useCallback(() => {
+    console.log("Sound play");
+    setIsCallSoundPlaying(true);
+  }, []);
+  
+  const stopCallSound = useCallback(() => {
+    console.log("Sound pause");
+    setIsCallSoundPlaying(false);
+  }, []);
 
   const handleCallUser = useCallback(async (id: string, username: string, video: boolean) => {
     if (id) {
@@ -32,13 +45,13 @@ const CallingRoom: React.FC = () => {
         audio: true,
         video: video,
       });
+      playCallSound();
       setVideoCall(video);
       const offer = await peerService.getOffer();
       socket?.emit("user:call", { username, to: id, offer, video });
       setMyStream(stream);
     }
-  }, [setRemoteSocketId, socket, setCallingUserName, setVideoCall]);
-
+  }, [setRemoteSocketId, socket, setCallingUserName, setVideoCall, playCallSound]);
 
   const handleUserJoined = useCallback(async (data: UserJoinedData) => {
     const { username, id, userId, video } = data;
@@ -56,7 +69,7 @@ const CallingRoom: React.FC = () => {
     async ({ username, from, offer, video }: IncommingCallData) => {
       setRemoteSocketId(from);
       setCallingNameFunction(username);
-      console.log("etCallingUserName(username)", username, " video ", video);
+      console.log("setCallingUserName(username)", username, " video ", video);
 
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
@@ -64,6 +77,7 @@ const CallingRoom: React.FC = () => {
       });
       setVideoCall(video);
       setMyStream(stream);
+      playCallSound();
       console.log(`Incoming Call`, from, offer);
       const ans = await peerService.getAnswer(offer);
       socket?.emit("call:accepted", { to: from, ans });
@@ -121,30 +135,36 @@ const CallingRoom: React.FC = () => {
     console.log("final - ", ans);
     await peerService.setLocalDesc(ans);
 
-  }, [peerService]);
-
+  }, []);
 
   const handleTrack = useCallback((ev: RTCTrackEvent) => {
     const remoteStream = ev.streams[0];
     console.log("GOT TRACKS!!");
     setRemoteStream(remoteStream);
-  }, [setRemoteStream]);
+    if (remoteUserId != authUser._id) {
+      stopCallSound();
+    }
+  }, [setRemoteStream, stopCallSound]);
 
   const handleCallingAccept = useCallback(() => {
+    stopCallSound();
     setSameUser(true);
     sendStreams();
-  }, [sendStreams, setSameUser]);
+  }, [sendStreams, setSameUser, stopCallSound]);
+
   // Call end------------------
   const handleCallingEnd = useCallback(() => {
+    stopCallSound();
     peerService.closeConnection();
     setCallingUserName("");
     setSameUser(false);
     setVideoCall(false);
     navigate("/message");
     window.location.reload();
-  }, [navigate, setSameUser, setCallingUserName]);
+  }, [navigate, setSameUser, setCallingUserName, stopCallSound]);
 
   const handleEndCall = useCallback(() => {
+    stopCallSound();
     peerService.closeConnection();
     setCallingUserName("");
     setSameUser(false);
@@ -152,16 +172,14 @@ const CallingRoom: React.FC = () => {
     socket?.emit("call:end", { to: remoteSocketId });
     navigate("/message");
     window.location.reload();
-  }, [navigate, remoteSocketId, socket, setCallingUserName]);
+  }, [navigate, remoteSocketId, socket, setCallingUserName, stopCallSound]);
 
   useEffect(() => {
-
     peerService.peer?.addEventListener("track", handleTrack);
     return () => {
       peerService.peer?.removeEventListener("track", handleTrack);
     };
   }, [peerService, handleTrack]);
-
 
   useEffect(() => {
     socket?.on("user:joined", handleUserJoined);
@@ -202,9 +220,9 @@ const CallingRoom: React.FC = () => {
     }
   }, [myStream, remoteStream]);
 
-
   return (
     <div className="w-full h-screen">
+      <CallSoundManager isPlaying={isCallSoundPlaying} />
       <div className="bg-white p-6 rounded-lg shadow-lg w-full h-full">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-semibold">{videoCall ? "Video Calling" : "Voice Calling"} </h2>
