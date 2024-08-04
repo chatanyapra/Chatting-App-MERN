@@ -146,18 +146,21 @@ const CallingRoom: React.FC = () => {
     const remoteStream = ev.streams[0];
     console.log("GOT TRACKS!!");
     setRemoteStream(remoteStream);
-    if (callingUser == "caller") {
-      stopCallSound();
-    }
   }, [setRemoteStream, stopCallSound]);
 
   const handleCallingAccept = useCallback(() => {
     stopCallSound();
     setSameUser(true);
     sendStreams();
+    console.log("remoteSocketId --- ", remoteSocketId);
+    socket?.emit("call:accept:calley", { to: remoteSocketId });
   }, [sendStreams, setSameUser, stopCallSound]);
 
   // Call end------------------
+  const handleCalleyAccept = useCallback(() => {
+    stopCallSound();
+  }, [stopCallSound]);
+  
   const handleCallingEnd = useCallback(() => {
     stopCallSound();
     peerService.closeConnection();
@@ -193,6 +196,7 @@ const CallingRoom: React.FC = () => {
     socket?.on("peer:nego:needed", handleNegoNeedIncomming);
     socket?.on("peer:nego:final", handleNegoNeedFinal);
     socket?.on("call:end", handleCallingEnd);
+    socket?.on("call:accept:calley", handleCalleyAccept);
 
     return () => {
       socket?.off("user:joined", handleUserJoined);
@@ -201,10 +205,12 @@ const CallingRoom: React.FC = () => {
       socket?.off("peer:nego:needed", handleNegoNeedIncomming);
       socket?.off("peer:nego:final", handleNegoNeedFinal);
       socket?.off("call:end", handleCallingEnd);
+      socket?.off("call:accept:calley", handleCalleyAccept);
     };
   }, [
     socket,
     setRemoteSocketId,
+    handleCalleyAccept,
     handleCallingEnd,
     handleUserJoined,
     handleIncommingCall,
