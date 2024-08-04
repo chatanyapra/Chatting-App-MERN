@@ -1,4 +1,4 @@
-import React, { useState , useCallback} from 'react';
+import React, { useState, useCallback } from 'react';
 import InputEmoji from 'react-input-emoji';
 import { FormEvent } from 'react';
 import { LuSendHorizonal } from "react-icons/lu";
@@ -7,7 +7,7 @@ import MessageText from './MessageText';
 import { useEffect, useRef } from 'react';
 import useGetMessages from "../hooks/useGetMessages";
 import { useSocketContext } from '../context/SocketContext';
-import {MyComponentProps} from "../types/types";
+import { MyComponentProps } from "../types/types";
 import { useAuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import peerService from "../peerService/peer";
@@ -16,10 +16,10 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
   const [newMessage, setNewMessage] = useState<string>('');
   const { loading, sendMessage } = useSendMessage();
   const { messages } = useGetMessages();
-  const {socket, onlineUsers } = useSocketContext();
+  const { socket, onlineUsers } = useSocketContext();
   const isOnline = onlineUsers.includes(conversation._id);
   const { setCallingUserName, authUser } = useAuthContext();
-  const navigate= useNavigate();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -31,18 +31,18 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
   const handleOnEnter = async (text: string) => {
     await sendMessage(text);
   };
-  
-  const handleVideoCall = useCallback((video:boolean) => {
-    if(authUser){
+
+  const handleVideoCall = useCallback((video: boolean) => {
+    if (authUser) {
       peerService.restartConnection();
       const room = conversation._id;
       const loggedinUserId = authUser._id;
       const username = authUser.fullname;
       setCallingUserName(conversation.fullname);
-      socket?.emit("room:join", { username, userId: loggedinUserId , room, video });
+      socket?.emit("room:join", { username, userId: loggedinUserId, room, video });
       navigate(`/room/${room}`);
     }
-  },[socket]);
+  }, [socket]);
 
 
   const lastMessageRef = useRef<HTMLDivElement>(null);
@@ -104,7 +104,7 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
 
       {/* <!-- sending message area --> */}
       <form onSubmit={handleSubmit} className="flex items-center justify-center md:px-2 min-h-14 p-2">
-        <div className="w-full flex justify-between">
+        <div className="w-full flex flex-row-reverse justify-between">
           <InputEmoji
             value={newMessage}
             onChange={setNewMessage}
@@ -112,15 +112,16 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
             onEnter={handleOnEnter}
             placeholder="Write your message"
             borderRadius={10}
-            borderColor={"#e2e8f0"} shouldReturn={false} shouldConvertEmojiToImage={false}          />
-          <button
-            type="submit"
-            className="text-white w-10 h-10 shrink-0 p-2 border-t border-gray-400 rounded-full bg-green-200 mt-1 mx-2 shadow-md text-center"
-            disabled={loading}
-          >
-            {loading ? <div className="loader"></div> : <LuSendHorizonal className="text-xl ml-0.5 flex text-blue-600" />}
-          </button>
+            borderColor={"#e2e8f0"} shouldReturn={false} shouldConvertEmojiToImage={false}
+          />
         </div>
+        <button
+          type="submit"
+          className="text-white w-10 h-10 shrink-0 p-2 border-t border-gray-400 rounded-full bg-green-200 mt-1 mx-2 shadow-md text-center"
+          disabled={loading}
+        >
+          {loading ? <div className="loader"></div> : <LuSendHorizonal className="text-xl ml-0.5 flex text-blue-600" />}
+        </button>
       </form>
     </div>
   );

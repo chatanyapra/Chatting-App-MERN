@@ -17,9 +17,10 @@ const CallingRoom: React.FC = () => {
   const [remoteSocketId, setRemoteSocketId] = useState<string | null>(null);
   const [remoteUserId, setRemoteUserId] = useState<string | null>(null);
   const [sameUser, setSameUser] = useState<boolean>(false);
+  const [callingUser, setCallingUser] = useState<string>("");
   const [myStream, setMyStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
-  const [isCallSoundPlaying, setIsCallSoundPlaying] = useState(false); // Manage call sound state
+  const [isCallSoundPlaying, setIsCallSoundPlaying] = useState(false);
 
   // Refs for video elements
   const myVideoRef = useRef<HTMLVideoElement>(null);
@@ -27,8 +28,9 @@ const CallingRoom: React.FC = () => {
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
 
   // Calling ringtone----------
-  const playCallSound = useCallback(() => {
-    console.log("Sound play");
+  const playCallSound = useCallback((type: string) => {
+    console.log("Sound play - ", type);
+    setCallingUser(type);
     setIsCallSoundPlaying(true);
   }, []);
   
@@ -45,7 +47,7 @@ const CallingRoom: React.FC = () => {
         audio: true,
         video: video,
       });
-      playCallSound();
+      playCallSound("caller");
       setVideoCall(video);
       const offer = await peerService.getOffer();
       socket?.emit("user:call", { username, to: id, offer, video });
@@ -77,23 +79,26 @@ const CallingRoom: React.FC = () => {
       });
       setVideoCall(video);
       setMyStream(stream);
-      playCallSound();
+      playCallSound("calley");
       console.log(`Incoming Call`, from, offer);
       const ans = await peerService.getAnswer(offer);
       socket?.emit("call:accepted", { to: from, ans });
     },
-    [socket, setMyStream, setCallingNameFunction, setVideoCall]
+    [socket, setMyStream, setCallingNameFunction, setVideoCall, playCallSound]
   );
 
   const sendStreams = useCallback(() => {
     console.log("send stream-----------");
+    if (callingUser == "calley") {
+      stopCallSound();
+    }
 
     if (myStream && peerService.peer) {
       for (const track of myStream.getTracks()) {
         peerService.peer.addTrack(track, myStream);
       }
     }
-  }, [myStream, peerService.peer]);
+  }, [myStream, peerService.peer, stopCallSound]);
 
   const handleCallAccepted = useCallback(async ({ from, ans }: CallAcceptedData) => {
     console.log("call:accepted --= ", ans, "from - ", from);
@@ -141,7 +146,7 @@ const CallingRoom: React.FC = () => {
     const remoteStream = ev.streams[0];
     console.log("GOT TRACKS!!");
     setRemoteStream(remoteStream);
-    if (remoteUserId != authUser._id) {
+    if (callingUser == "caller") {
       stopCallSound();
     }
   }, [setRemoteStream, stopCallSound]);
