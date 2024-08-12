@@ -1,10 +1,8 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import InputEmoji from 'react-input-emoji';
-import { FormEvent } from 'react';
-import { LuSendHorizonal } from "react-icons/lu";
+import { LuSendHorizonal, LuLink2, LuX } from "react-icons/lu";
 import useSendMessage from '../hooks/useSendMessage';
 import MessageText from './MessageText';
-import { useEffect, useRef } from 'react';
 import useGetMessages from "../hooks/useGetMessages";
 import { useSocketContext } from '../context/SocketContext';
 import { MyComponentProps } from "../types/types";
@@ -19,18 +17,53 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
   const { socket, onlineUsers } = useSocketContext();
   const isOnline = onlineUsers.includes(conversation._id);
   const { setCallingUserName, authUser } = useAuthContext();
+  const [selectedMedia, setSelectedMedia] = useState<string | null>(null);
+  const [mediaType, setMediaType] = useState<string | null>(null);
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleMediaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          setSelectedMedia(reader.result);
+          setMediaType(file.type);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveFile = useCallback(() => {
+    setSelectedMedia(null);
+    setMediaType(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, []);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!newMessage) return;
-    await sendMessage(newMessage);
+
+    const form = event.target as HTMLFormElement;
+    const fileInput = form.elements.namedItem('file') as HTMLInputElement;
+
+    if (!newMessage && !selectedMedia) return;
+
+    let file = fileInput?.files?.[0];
+
+    await sendMessage(newMessage, file);
     setNewMessage('');
+    handleRemoveFile();
+    fileInput.value = '';
   };
 
-  const handleOnEnter = async (text: string) => {
-    await sendMessage(text);
-  };
+
+  // const handleOnEnter = async (text: string) => {
+  //   await sendMessage(text);
+  // };
 
   const handleVideoCall = useCallback((video: boolean) => {
     if (authUser) {
@@ -56,7 +89,7 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
 
   let textColor = '';
   return (
-    <div className={`w-full shadow-md bg-white rounded-xl dark:bg-black mt-0 max-md:${visibility ? 'visible' : 'hidden'}`}>
+    <div className={`w-full shadow-md bg-white rounded-xl dark:bg-black relative mt-0 max-md:${visibility ? 'visible' : 'hidden'}`}>
       {/* <!-- chat heading --> */}
       <div className="flex items-center justify-between gap-2 px-6 z-10 border-b dark:border-slate-700 uk-animation-slide-top-medium">
         <div className="flex items-center sm:gap-4 gap-2 md:py-4 py-2">
@@ -103,26 +136,55 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
       </div>
 
       {/* <!-- sending message area --> */}
-      <form onSubmit={handleSubmit} className="flex items-center justify-center md:px-2 min-h-14 p-2">
-        <div className="w-full flex flex-row-reverse justify-between">
+      <form onSubmit={handleSubmit} encType="multipart/form-data" className="flex items-center justify-center md:px-2 min-h-14 p-2">
+        <div className="w-full flex justify-between z-10 bg-white rounded-3xl">
           <InputEmoji
             value={newMessage}
             onChange={setNewMessage}
-            cleanOnEnter
-            onEnter={handleOnEnter}
+            // cleanOnEnter
+            // onEnter={handleOnEnter}
             placeholder="Write your message"
-            borderRadius={10}
+            borderRadius={40}
             borderColor={"#e2e8f0"} shouldReturn={false} shouldConvertEmojiToImage={false}
           />
+          <div title='Attach'>
+            <label htmlFor="file">
+              <LuLink2 className='text-2xl mx-0.5 text-gray-500 mt-3.5 hover:text-blue-600 cursor-pointer' />
+            </label>
+            <input type="file" id="file" name="file" className='hidden' accept="video/*,image/*" onChange={handleMediaChange} ref={fileInputRef}></input>
+          </div>
+          <button
+            type="submit"
+            className="text-white w-10 h-10 shrink-0 p-2 border-t border-gray-400 rounded-full bg-green-200 mt-1 mx-2 shadow-md text-center"
+            disabled={loading}
+          >
+            {loading ? <div className="loader"></div> : <LuSendHorizonal className="text-xl ml-0.5 flex text-blue-600" />}
+          </button>
         </div>
-        <button
-          type="submit"
-          className="text-white w-10 h-10 shrink-0 p-2 border-t border-gray-400 rounded-full bg-green-200 mt-1 mx-2 shadow-md text-center"
-          disabled={loading}
-        >
-          {loading ? <div className="loader"></div> : <LuSendHorizonal className="text-xl ml-0.5 flex text-blue-600" />}
-        </button>
       </form>
+      {selectedMedia && (
+        <div className='absolute bottom-0 w-full h-60 bg-blue-200 rounded-md overflow-hidden'>
+          <div className='relative flex w-full h-full '>
+            <div className='w-[calc(100%-75px)] m-3 mb-8 border-2 border-gray-400 border-dashed rounded-md'>
+              <>
+                {mediaType && mediaType.startsWith("image/") ? (
+                  <img src={selectedMedia} alt="Selected Image" className="h-full" />
+                ) : (
+                  <video controls className="h-full w-full">
+                    <source src={selectedMedia} type={mediaType || "video/mp4"} className=' h-full w-full' />
+                    Your browser does not support the video tag.
+                  </video>
+                )}
+              </>
+            </div>
+            <LuX
+              type="button"
+              className="absolute right-6 top-20 text-2xl text-gray-500 outline-dashed outline-2 outline-offset-4 rounded-full cursor-pointer"
+              onClick={handleRemoveFile}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
