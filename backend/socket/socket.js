@@ -18,7 +18,6 @@ export const getReceiverSocketId = (receiverId) => {
     return userSocketMap[receiverId];
 }
 
-
 io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
     console.log("User connected with userId:", userId);
@@ -65,11 +64,7 @@ io.on("connection", (socket) => {
         console.log("peer:nego:done", ans);
         io.to(to).emit("peer:nego:final", { from: socket.id, ans });
     });
-    
-    socket.on("call:accept:calley", ({ to }) => {
-        io.to(to).emit("call:accept:calley", { from: socket.id });
-    });
-    
+
     socket.on('call:end', ({ to }) => {
         console.log("new disconnect--------------");
         socket.to(to).emit('call:end');
