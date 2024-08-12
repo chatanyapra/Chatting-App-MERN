@@ -65,6 +65,10 @@ io.on("connection", (socket) => {
         io.to(to).emit("peer:nego:final", { from: socket.id, ans });
     });
 
+    socket.on("call:accept:calley", ({ to }) => {
+        io.to(to).emit("call:accept:calley", { from: socket.id });
+    });
+
     socket.on('call:end', ({ to }) => {
         console.log("new disconnect--------------");
         socket.to(to).emit('call:end');
