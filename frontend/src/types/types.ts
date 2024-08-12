@@ -1,5 +1,45 @@
 
 export interface UserJoinedData {
+<<<<<<< HEAD
+    video: boolean;
+    username: string;
+    id: string;
+    userId: string;
+  }
+export interface UserJoinedDataRequest {
+    video: boolean;
+    username: string;
+    userId: string;
+    room: string;
+  }
+  
+  export interface IncommingCallData {
+    video: boolean;
+    username: string;
+    from: string;
+    offer: RTCSessionDescriptionInit;
+  }
+  
+  export interface CallAcceptedData {
+    from: string;
+    ans: RTCSessionDescriptionInit;
+  }
+  
+  export interface NegoNeededData {
+    from: string;
+    offer: RTCSessionDescriptionInit;
+  }
+  
+  export interface NegoNeedFinalData {
+    ans: RTCSessionDescriptionInit;
+  }
+  
+  export interface JoinRoomData {
+    email: string;
+    room: string;
+  }
+  
+=======
   video: boolean;
   username: string;
   id: string;
@@ -38,6 +78,7 @@ export interface JoinRoomData {
   room: string;
 }
 
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
 export interface Conversation {
   _id: string;
   username: string;
@@ -46,6 +87,15 @@ export interface Conversation {
 }
 
 export interface MessageType {
+<<<<<<< HEAD
+    shouldShake ?: boolean;
+    _id: string;
+    message: string;
+    senderId: string;
+    receiverId: string;
+    createdAt: string;
+    fileUrl ?: string;
+=======
   shouldShake ?: boolean;
   _id: string;
   message: string;
@@ -53,6 +103,7 @@ export interface MessageType {
   receiverId: string;
   createdAt: string;
   fileUrl ?: string;
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
 }
 
 export interface UseGetMessagesReturn {

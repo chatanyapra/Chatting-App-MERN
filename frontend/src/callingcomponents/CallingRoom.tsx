@@ -27,6 +27,8 @@ const CallingRoom: React.FC = () => {
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
 
+<<<<<<< HEAD
+=======
   // Calling ringtone----------
   const playCallSound = useCallback((type: string) => {
     console.log("Sound play - ", type);
@@ -39,6 +41,7 @@ const CallingRoom: React.FC = () => {
     setIsCallSoundPlaying(false);
   }, []);
 
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
   const handleCallUser = useCallback(async (id: string, username: string, video: boolean) => {
     if (id) {
       setRemoteSocketId(id);
@@ -47,13 +50,21 @@ const CallingRoom: React.FC = () => {
         audio: true,
         video: video,
       });
+<<<<<<< HEAD
+=======
       playCallSound("caller");
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
       setVideoCall(video);
       const offer = await peerService.getOffer();
       socket?.emit("user:call", { username, to: id, offer, video });
       setMyStream(stream);
     }
+<<<<<<< HEAD
+  }, [setRemoteSocketId, socket, setCallingUserName, setVideoCall]);
+
+=======
   }, [setRemoteSocketId, socket, setCallingUserName, setVideoCall, playCallSound]);
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
 
   const handleUserJoined = useCallback(async (data: UserJoinedData) => {
     const { username, id, userId, video } = data;
@@ -71,7 +82,11 @@ const CallingRoom: React.FC = () => {
     async ({ username, from, offer, video }: IncommingCallData) => {
       setRemoteSocketId(from);
       setCallingNameFunction(username);
+<<<<<<< HEAD
+      console.log("etCallingUserName(username)", username, " video ", video);
+=======
       console.log("setCallingUserName(username)", username, " video ", video);
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
 
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
@@ -84,14 +99,21 @@ const CallingRoom: React.FC = () => {
       const ans = await peerService.getAnswer(offer);
       socket?.emit("call:accepted", { to: from, ans });
     },
+<<<<<<< HEAD
+    [socket, setMyStream, setCallingNameFunction, setVideoCall]
+=======
     [socket, setMyStream, setCallingNameFunction, setVideoCall, playCallSound]
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
   );
 
   const sendStreams = useCallback(() => {
     console.log("send stream-----------");
+<<<<<<< HEAD
+=======
     if (callingUser == "calley") {
       stopCallSound();
     }
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
 
     if (myStream && peerService.peer) {
       for (const track of myStream.getTracks()) {
@@ -139,6 +161,11 @@ const CallingRoom: React.FC = () => {
   const handleNegoNeedFinal = useCallback(async ({ ans }: NegoNeedFinalData) => {
     console.log("final - ", ans);
     await peerService.setLocalDesc(ans);
+<<<<<<< HEAD
+
+  }, [peerService]);
+=======
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
 
   }, []);
 
@@ -146,7 +173,11 @@ const CallingRoom: React.FC = () => {
     const remoteStream = ev.streams[0];
     console.log("GOT TRACKS!!");
     setRemoteStream(remoteStream);
+<<<<<<< HEAD
+  }, [setRemoteStream]);
+=======
   }, [setRemoteStream, stopCallSound]);
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
 
   const handleCallingAccept = useCallback(() => {
     stopCallSound();
@@ -169,7 +200,11 @@ const CallingRoom: React.FC = () => {
     setVideoCall(false);
     navigate("/message");
     window.location.reload();
+<<<<<<< HEAD
+  }, [navigate, setSameUser, setCallingUserName]);
+=======
   }, [navigate, setSameUser, setCallingUserName, stopCallSound]);
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
 
   const handleEndCall = useCallback(() => {
     stopCallSound();
@@ -180,7 +215,11 @@ const CallingRoom: React.FC = () => {
     socket?.emit("call:end", { to: remoteSocketId });
     navigate("/message");
     window.location.reload();
+<<<<<<< HEAD
+  }, [navigate, remoteSocketId, socket, setCallingUserName]);
+=======
   }, [navigate, remoteSocketId, socket, setCallingUserName, stopCallSound]);
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
 
   useEffect(() => {
     peerService.peer?.addEventListener("track", handleTrack);
@@ -189,6 +228,10 @@ const CallingRoom: React.FC = () => {
     };
   }, [peerService, handleTrack]);
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
   useEffect(() => {
     socket?.on("user:joined", handleUserJoined);
     socket?.on("incomming:call", handleIncommingCall);
@@ -210,7 +253,10 @@ const CallingRoom: React.FC = () => {
   }, [
     socket,
     setRemoteSocketId,
+<<<<<<< HEAD
+=======
     handleCalleyAccept,
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
     handleCallingEnd,
     handleUserJoined,
     handleIncommingCall,
@@ -233,7 +279,10 @@ const CallingRoom: React.FC = () => {
 
   return (
     <div className="w-full h-screen">
+<<<<<<< HEAD
+=======
       <CallSoundManager isPlaying={isCallSoundPlaying} />
+>>>>>>> 5e467ffbfb89e0c299b479cdfefd104107ede6ad
       <div className="bg-white p-6 rounded-lg shadow-lg w-full h-full">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-semibold">{videoCall ? "Video Calling" : "Voice Calling"} </h2>
