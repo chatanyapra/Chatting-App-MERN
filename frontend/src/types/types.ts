@@ -52,6 +52,7 @@ export interface MessageType {
   senderId: string;
   receiverId: string;
   createdAt: string;
+  fileUrl ?: string;
 }
 
 export interface UseGetMessagesReturn {

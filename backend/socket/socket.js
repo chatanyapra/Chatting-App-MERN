@@ -6,7 +6,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: [`https://auramic-chatting.onrender.com`],
+        origin: [`http://localhost:5001`],
         methods: ['GET', 'POST'],
         credentials: true
     }
@@ -17,7 +17,6 @@ let userSocketMap = {}; // {userid: socket.id}
 export const getReceiverSocketId = (receiverId) => {
     return userSocketMap[receiverId];
 }
-
 
 io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
@@ -65,11 +64,7 @@ io.on("connection", (socket) => {
         console.log("peer:nego:done", ans);
         io.to(to).emit("peer:nego:final", { from: socket.id, ans });
     });
-    
-    socket.on("call:accept:calley", ({ to }) => {
-        io.to(to).emit("call:accept:calley", { from: socket.id });
-    });
-    
+
     socket.on('call:end', ({ to }) => {
         console.log("new disconnect--------------");
         socket.to(to).emit('call:end');

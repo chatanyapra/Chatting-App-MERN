@@ -2,28 +2,45 @@ import asyncHandler from "express-async-handler";
 import Conversation from "../models/conversationModel.js";
 import Message from "../models/messageModel.js"
 import { io } from '../socket/socket.js';
+import cloudinary from '../cloudinary/cloudinaryConfig.js';
+import fs from 'fs';
 import { getReceiverSocketId } from "../socket/socket.js";
 
-export const sendMessage = asyncHandler( async(req, res) => {
+export const sendMessage = asyncHandler(async (req, res) => {
     try {
-        const {message} = req.body;
-        const {id: receiverId} = req.params;
-        const senderId= req.user._id;
+        const { message } = req.body;
+        const { id: receiverId } = req.params;
+        const senderId = req.user._id;
 
         let conversation = await Conversation.findOne({
-            participants:{$all: [senderId, receiverId]}
+            participants: { $all: [senderId, receiverId] }
         })
-        if(!conversation){
+        if (!conversation) {
             conversation = await Conversation.create({
                 participants: [senderId, receiverId]
             })
         }
+        let fileUrl = null;
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                resource_type: "auto"
+            });
+
+            fileUrl = result.secure_url;
+
+            fs.unlink(req.file.path, (err) => {
+                if (err) {
+                    console.error('Error deleting the file from the server:', err);
+                }
+            });
+        }
         const newMessage = new Message({
             senderId,
             receiverId,
-            message
+            message,
+            fileUrl
         })
-        if(newMessage){
+        if (newMessage) {
             conversation.messages.push(newMessage._id);
         }
         await Promise.all([conversation.save(), newMessage.save()]);
@@ -34,26 +51,26 @@ export const sendMessage = asyncHandler( async(req, res) => {
             io.to(receiverSocketId).emit("newMessage", newMessage);
         }
 
-        res.status(201).json(newMessage);
+        res.status(201).json({ newMessage, fileUrl });
 
     } catch (error) {
         console.log("Error in Message Controller", error.message);
-        res.status(400).json({message: "Internal Server Error!"});
+        res.status(400).json({ message: "Internal Server Error!" });
     }
-    const receiverId = req.params.id;
-    res.status(201).json({message: `Message sended! ${receiverId}`});
+    // const receiverId = req.params.id;
+    // res.status(201).json({message: `Message sended! ${receiverId}`});
 })
 
-export const getMessages = asyncHandler(async(req, res) => {
+export const getMessages = asyncHandler(async (req, res) => {
     try {
-        const {id:chatUserId} = req.params;
+        const { id: chatUserId } = req.params;
         const senderId = req.user._id;
 
         const conversation = await Conversation.findOne({
-            participants: {$all: [senderId, chatUserId]},
+            participants: { $all: [senderId, chatUserId] },
         }).populate("messages");  //populate function not return the reference/_id but return the actual messages from the collection
 
-        if(!conversation){
+        if (!conversation) {
             return res.status(200).json([]);
         }
         const message = conversation.messages;
@@ -61,6 +78,6 @@ export const getMessages = asyncHandler(async(req, res) => {
 
     } catch (error) {
         console.log("Error in Message Controller", error.message);
-        res.status(400).json({message: "Internal Server Error!"});
+        res.status(400).json({ message: "Internal Server Error!" });
     }
 })
