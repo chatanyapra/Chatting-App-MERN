@@ -2,15 +2,17 @@ import React, { useEffect, useCallback, useState, useRef } from "react";
 import peerService from "../peerService/peer";
 import { useSocketContext } from "../context/SocketContext";
 import "./callingComponent.css";
+import userImage from "../assets/userimage.png";
 import { UserJoinedData, IncommingCallData, CallAcceptedData, NegoNeededData, NegoNeedFinalData } from "../types/types";
 import { useAuthContext } from "../context/AuthContext";
-import { LuPhoneCall, LuPhoneOff  } from "react-icons/lu";
+import { LuPhoneCall, LuPhoneOff } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 
 const CallingRoom: React.FC = () => {
   const navigate = useNavigate();
   const { socket } = useSocketContext();
-  const { authUser } = useAuthContext();
+  const { callingUserName, setCallingUserName, authUser } = useAuthContext();
+  const [videoCall, setVideoCall] = useState<boolean>(false);
   const [remoteSocketId, setRemoteSocketId] = useState<string | null>(null);
   const [remoteUserId, setRemoteUserId] = useState<string | null>(null);
   const [sameUser, setSameUser] = useState<boolean>(false);
@@ -20,43 +22,58 @@ const CallingRoom: React.FC = () => {
   // Refs for video elements
   const myVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteAudioRef = useRef<HTMLAudioElement>(null);
 
-  const handleUserJoined = useCallback(({ email, id, userId }: UserJoinedData) => {
-    console.log(`Email ${email} joined room`);
-    setRemoteSocketId(id);
-    setRemoteUserId(userId);
-  }, [setRemoteSocketId, setRemoteUserId]);
-
-  const handleCallUser = useCallback(async () => {
-    if (remoteSocketId) {
+  const handleCallUser = useCallback(async (id: string, username: string, video: boolean) => {
+    if (id) {
+      setRemoteSocketId(id);
+      console.log("if remoteSocketId--", id);
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
-        video: true,
+        video: video,
       });
+      setVideoCall(video);
       const offer = await peerService.getOffer();
-      socket?.emit("user:call", { to: remoteSocketId, offer });
+      socket?.emit("user:call", { username, to: id, offer, video });
       setMyStream(stream);
     }
-  }, [remoteSocketId, socket, peerService]);
+  }, [setRemoteSocketId, socket, setCallingUserName, setVideoCall]);
+
+
+  const handleUserJoined = useCallback(async (data: UserJoinedData) => {
+    const { username, id, userId, video } = data;
+    console.log(`setRemoteUserId room (userId) - `, userId, ", setRemoteSocketId - ", id, " username - ", username, " video - ", video);
+    setRemoteSocketId(id);
+    setRemoteUserId(userId);
+    await handleCallUser(id, username, video);
+  }, [setRemoteSocketId, setRemoteUserId, handleCallUser, remoteSocketId]);
+
+  const setCallingNameFunction = useCallback(async (username: string) => {
+    await setCallingUserName(username);
+  }, [setCallingUserName, callingUserName]);
 
   const handleIncommingCall = useCallback(
-    async ({ from, offer }: IncommingCallData) => {
+    async ({ username, from, offer, video }: IncommingCallData) => {
       setRemoteSocketId(from);
+      setCallingNameFunction(username);
+      console.log("etCallingUserName(username)", username, " video ", video);
+
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
-        video: true,
+        video: video,
       });
+      setVideoCall(video);
       setMyStream(stream);
       console.log(`Incoming Call`, from, offer);
       const ans = await peerService.getAnswer(offer);
       socket?.emit("call:accepted", { to: from, ans });
     },
-    [socket, peerService, setMyStream]
+    [socket, setMyStream, setCallingNameFunction, setVideoCall]
   );
 
   const sendStreams = useCallback(() => {
     console.log("send stream-----------");
-    
+
     if (myStream && peerService.peer) {
       for (const track of myStream.getTracks()) {
         peerService.peer.addTrack(track, myStream);
@@ -64,17 +81,17 @@ const CallingRoom: React.FC = () => {
     }
   }, [myStream, peerService.peer]);
 
-  const handleCallAccepted = useCallback(async({ ans }: CallAcceptedData) => {
-      console.log("call:accepted -----= ", ans);
-      
-      await peerService.setLocalDesc(ans);
-      console.log("remoteUserId - ", remoteUserId," authUser._id - ", authUser._id);
-      
-      if(remoteUserId != authUser._id){
-        sendStreams();
-        setSameUser(true);
-      }
-    },
+  const handleCallAccepted = useCallback(async ({ from, ans }: CallAcceptedData) => {
+    console.log("call:accepted --= ", ans, "from - ", from);
+
+    await peerService.setLocalDesc(ans);
+    console.log("remoteUseriiId - ", remoteUserId, " authUser._id - ", authUser._id);
+
+    if (remoteUserId != authUser._id) {
+      sendStreams();
+      setSameUser(true);
+    }
+  },
     [peerService, remoteUserId, remoteSocketId, sendStreams, setSameUser]
   );
 
@@ -101,9 +118,9 @@ const CallingRoom: React.FC = () => {
   );
 
   const handleNegoNeedFinal = useCallback(async ({ ans }: NegoNeedFinalData) => {
-    console.log("final - ",ans);
+    console.log("final - ", ans);
     await peerService.setLocalDesc(ans);
-    
+
   }, [peerService]);
 
 
@@ -111,7 +128,7 @@ const CallingRoom: React.FC = () => {
     const remoteStream = ev.streams[0];
     console.log("GOT TRACKS!!");
     setRemoteStream(remoteStream);
-  },[setRemoteStream]);
+  }, [setRemoteStream]);
 
   const handleCallingAccept = useCallback(() => {
     setSameUser(true);
@@ -120,19 +137,22 @@ const CallingRoom: React.FC = () => {
   // Call end------------------
   const handleCallingEnd = useCallback(() => {
     peerService.closeConnection();
-    console.log("calend");
+    setCallingUserName("");
     setSameUser(false);
+    setVideoCall(false);
     navigate("/message");
-    // window.location.reload();
-  }, [navigate, setSameUser]);
+    window.location.reload();
+  }, [navigate, setSameUser, setCallingUserName]);
 
   const handleEndCall = useCallback(() => {
     peerService.closeConnection();
+    setCallingUserName("");
     setSameUser(false);
+    setVideoCall(false);
     socket?.emit("call:end", { to: remoteSocketId });
     navigate("/message");
-    // window.location.reload();
-  }, [navigate, remoteSocketId, socket, setSameUser]);
+    window.location.reload();
+  }, [navigate, remoteSocketId, socket, setCallingUserName]);
 
   useEffect(() => {
 
@@ -142,7 +162,7 @@ const CallingRoom: React.FC = () => {
     };
   }, [peerService, handleTrack]);
 
-  
+
   useEffect(() => {
     socket?.on("user:joined", handleUserJoined);
     socket?.on("incomming:call", handleIncommingCall);
@@ -161,6 +181,7 @@ const CallingRoom: React.FC = () => {
     };
   }, [
     socket,
+    setRemoteSocketId,
     handleCallingEnd,
     handleUserJoined,
     handleIncommingCall,
@@ -169,15 +190,6 @@ const CallingRoom: React.FC = () => {
     handleNegoNeedFinal,
   ]);
 
-  // Set srcObject for video elements
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      handleCallUser();
-    }, 1000); 
-
-    return () => clearTimeout(timeoutId);
-  }, [handleCallUser]);
-
   useEffect(() => {
     if (myStream && myVideoRef.current) {
       myVideoRef.current.srcObject = myStream;
@@ -185,45 +197,56 @@ const CallingRoom: React.FC = () => {
     if (remoteStream && remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = remoteStream;
     }
+    if (remoteStream && remoteAudioRef.current) {
+      remoteAudioRef.current.srcObject = remoteStream;
+    }
   }, [myStream, remoteStream]);
 
 
   return (
-    <div className="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg max-sm:h-screen">
+    <div className="w-full h-screen">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full h-full">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-semibold">Video Calling</h2>
-          <button className="text-gray-500 hover:text-gray-700">
-            <i className="fas fa-times-circle fa-2x"></i>
-          </button>
+          <h2 className="text-2xl font-semibold">{videoCall ? "Video Calling" : "Voice Calling"} </h2>
+          <span></span>
         </div>
         <div className="video-container mb-4">
-          {remoteStream && (
-            <video autoPlay ref={remoteVideoRef} className="videoMainPlayer"></video>
-          )}
-          <div className="user-video">
-            {myStream && (
-              <video ref={myVideoRef} autoPlay muted className="videoplayer" />
-            )}
-          </div>
+          {!videoCall ?
+            <>
+              <div className="w-full mt-5 pt-20">
+                <img src={userImage} className="m-auto" alt="" />
+              </div>
+              <audio ref={remoteAudioRef} autoPlay controls={false} />
+            </>
+            :
+            <>
+              {remoteStream && (
+                <video autoPlay ref={remoteVideoRef} className="videoMainPlayer"></video>
+              )}
+              <div className="user-video">
+                {myStream && (
+                  <video ref={myVideoRef} autoPlay muted className="videoplayer" />
+                )}
+              </div>
+            </>
+          }
         </div>
         <div className="text-center mb-4">
-          <h3 className="text-xl font-medium">John Doe</h3>
-          {/* <p className="text-gray-500">{remoteSocketId ? "Connected" : "Connecting..."}</p> */}
+          <h3 className="text-xl font-medium">{callingUserName != "" && callingUserName != null ? callingUserName : "Unknown"}</h3>
         </div>
         <div className="flex justify-center space-x-4">
           {myStream && (
             <>
               {!sameUser && (
                 <button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full" onClick={handleCallingAccept}>
-                  <LuPhoneCall className="text-2xl"/>
+                  <LuPhoneCall className="text-2xl" />
                 </button>
               )}
-              <button className="bg-red-500 hover:bg-red-600 text-white p-4 rounded-full" onClick={handleEndCall}>
-                <LuPhoneOff className="text-2xl"/>
-              </button>
             </>
           )}
+          <button className="bg-red-500 hover:bg-red-600 text-white p-4 rounded-full" onClick={handleEndCall}>
+            <LuPhoneOff className="text-2xl" />
+          </button>
         </div>
       </div>
     </div>

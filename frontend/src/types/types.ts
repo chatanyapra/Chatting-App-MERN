@@ -1,15 +1,20 @@
 
 export interface UserJoinedData {
-    email: string;
+    video: boolean;
+    username: string;
     id: string;
     userId: string;
   }
 export interface UserJoinedDataRequest {
-    email: string;
+    video: boolean;
+    username: string;
+    userId: string;
     room: string;
   }
   
   export interface IncommingCallData {
+    video: boolean;
+    username: string;
     from: string;
     offer: RTCSessionDescriptionInit;
   }
@@ -47,6 +52,7 @@ export interface MessageType {
     senderId: string;
     receiverId: string;
     createdAt: string;
+    fileUrl ?: string;
 }
 
 export interface UseGetMessagesReturn {
