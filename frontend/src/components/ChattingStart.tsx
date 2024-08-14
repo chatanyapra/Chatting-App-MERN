@@ -5,7 +5,7 @@ import { useAuthContext } from "../context/AuthContext";
 const ChattingStart = () => {
   const { authUser } = useAuthContext();
   return (
-    <div className={`w-full shadow-md bg-white overflow-hidden rounded-xl dark:bg-black max-md:mt-20 max-md:hidden`}>
+    <div className={`w-full shadow-md bg-white overflow-hidden max-md:mt-20 max-md:hidden border-solid border-2 border-gray-400 rounded-r-lg`}>
       <div className="w-full flex justify-between align-middle p-2">
         <div className="flex">
           <img src={authUser.profilePic} className="w-14 h-14" alt="" />
@@ -23,7 +23,7 @@ const ChattingStart = () => {
           <img src={authUser.profilePic} className="w-24 h-24 rounded-full mx-auto mb-3" alt="" />
           <div className="mt-8">
             <h2 className="md:text-xl text-base font-medium   text-green-500">Welcome </h2>
-            <div className="md:text-xl text-base font-medium text-black dark:text-white">{authUser.fullname} </div>
+            <div className="md:text-xl text-base font-medium text-black ">{authUser.fullname} </div>
           </div>
         </div>
       </div>

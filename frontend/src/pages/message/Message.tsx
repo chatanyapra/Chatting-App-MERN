@@ -86,13 +86,13 @@ export default function Message() {
                 onClick={logout}>
                 Logout
             </div>
-            <div className="flex px-14 mt-24 max-md:px-0  max-md:mt-20  max-md:w-full">
-                <div className={`max-md:w-full relative ${visibilityChat ? "hidden" : ""}`}>
+            <div className="flex px-14 mt-16 max-md:px-0 max-md:w-full ">
+                <div className={`max-md:w-full relative ${visibilityChat ? "hidden" : ""} border-solid border-2 border-gray-400 rounded-l-lg`}>
 
-                    <div id="side-chat" className="shadow-md rounded-xl w-full bg-white z-50 max-md:shadow dark:bg-black">
+                    <div id="side-chat" className="shadow-md rounded-xl w-full bg-white z-50 max-md:shadow">
 
                         {/* <!-- heading title --> */}
-                        <div className="p-4 border-b dark:border-slate-700 ">
+                        <div className="p-4 border-b  ">
 
                             <div className="flex mt-2 items-center justify-between">
 
@@ -119,7 +119,7 @@ export default function Message() {
 
                         </div>
 
-                        <div className="small-scroll space-y-2 p-2 overflow-y-auto md:h-[calc(100vh-204px)] h-[calc(100vh-80px)]">
+                        <div className="small-scroll space-y-2 p-2 overflow-y-auto md:h-[calc(100vh-198px)] h-[calc(100vh-80px)]">
 
                                 {newSendMessage || changeStyle ? 
                                 conversations && conversations.map((conversation) => (

@@ -89,12 +89,12 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
 
   let textColor = '';
   return (
-    <div className={`w-full shadow-md bg-white rounded-xl dark:bg-black relative mt-0 max-md:${visibility ? 'visible' : 'hidden'}`}>
+    <div className={`w-full max-w-screen-lg shadow-md overflow-hidden bg-white relative mt-0 max-md:${visibility ? 'visible' : 'hidden'} border-solid border-2 border-gray-400 rounded-r-lg`}>
       {/* <!-- chat heading --> */}
       <div className="flex items-center justify-between gap-2 px-6 z-10 border-b dark:border-slate-700 uk-animation-slide-top-medium">
         <div className="flex items-center sm:gap-4 gap-2 md:py-4 py-2">
           <div className="relative cursor-pointer max-md:hidden">
-            <img src={conversation.profilePic} alt="" className="w-8 h-8 rounded-full shadow" />
+            <img src={conversation.profilePic} alt="" className="w-11 h-11 rounded-full shadow" />
             {isOnline && (<div className="w-2 h-2 bg-teal-500 rounded-full absolute right-0 bottom-0 m-px"></div>)}
           </div>
           <div className="cursor-pointer">
@@ -126,8 +126,8 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
         <div className="py-5 text-center text-sm lg:pt-8 h-auto overflow-hidden">
           <img src={conversation.profilePic} className="w-24 h-24 rounded-full mx-auto mb-3" alt="" />
           <div className="mt-8">
-            <div className="md:text-xl text-base font-medium text-black dark:text-white"> {conversation.fullname} </div>
-            <div className="text-gray-500 text-sm dark:text-white/80"> {conversation.username} </div>
+            <div className="md:text-xl text-base font-medium text-black "> {conversation.fullname} </div>
+            <div className="text-gray-500 text-sm"> {conversation.username} </div>
           </div>
         </div>
         <div className="text-sm font-medium space-y-6">
@@ -138,15 +138,19 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
       {/* <!-- sending message area --> */}
       <form onSubmit={handleSubmit} encType="multipart/form-data" className="flex items-center justify-center md:px-2 min-h-14 p-2">
         <div className="w-full flex justify-between z-10 bg-white rounded-3xl">
+          <div className='w-full max-w-screen-lg overflow-hidden h-12'>
           <InputEmoji
-            value={newMessage}
-            onChange={setNewMessage}
-            // cleanOnEnter
-            // onEnter={handleOnEnter}
-            placeholder="Write your message"
-            borderRadius={40}
-            borderColor={"#e2e8f0"} shouldReturn={false} shouldConvertEmojiToImage={false}
-          />
+          value={newMessage}
+          onChange={setNewMessage}
+          height={10} 
+          keepOpened={true}
+          placeholder="Write your message"
+          borderRadius={10}
+          shouldReturn={true}
+          borderColor={"rgb(71 85 105)"}
+          shouldConvertEmojiToImage={false}
+        />
+          </div>
           <div title='Attach'>
             <label htmlFor="file">
               <LuLink2 className='text-2xl mx-0.5 text-gray-500 mt-3.5 hover:text-blue-600 cursor-pointer' />

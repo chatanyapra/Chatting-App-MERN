@@ -16,7 +16,7 @@ const CallingRoom: React.FC = () => {
   const [videoCall, setVideoCall] = useState<boolean>(false);
   const [remoteSocketId, setRemoteSocketId] = useState<string | null>(null);
   const [remoteUserId, setRemoteUserId] = useState<string | null>(null);
-  const [sameUser, setSameUser] = useState<boolean>(false);
+  const [sameUser, setSameUser] = useState<boolean>(true);
   const [callingUser, setCallingUser] = useState<string>("");
   const [myStream, setMyStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
@@ -80,11 +80,12 @@ const CallingRoom: React.FC = () => {
       setVideoCall(video);
       setMyStream(stream);
       playCallSound("calley");
+      setSameUser(false);
       console.log(`Incoming Call`, from, offer);
       const ans = await peerService.getAnswer(offer);
       socket?.emit("call:accepted", { to: from, ans });
     },
-    [socket, setMyStream, setCallingNameFunction, setVideoCall, playCallSound]
+    [socket, setMyStream, setCallingNameFunction, setVideoCall, playCallSound, setSameUser]
   );
 
   const sendStreams = useCallback(() => {
