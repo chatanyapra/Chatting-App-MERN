@@ -33,7 +33,7 @@ const CallingRoom: React.FC = () => {
     setCallingUser(type);
     setIsCallSoundPlaying(true);
   }, []);
-  
+
   const stopCallSound = useCallback(() => {
     console.log("Sound pause");
     setIsCallSoundPlaying(false);
@@ -161,7 +161,7 @@ const CallingRoom: React.FC = () => {
   const handleCalleyAccept = useCallback(() => {
     stopCallSound();
   }, [stopCallSound]);
-  
+
   const handleCallingEnd = useCallback(() => {
     stopCallSound();
     peerService.closeConnection();
@@ -235,12 +235,14 @@ const CallingRoom: React.FC = () => {
   return (
     <div className="w-full h-screen">
       <CallSoundManager isPlaying={isCallSoundPlaying} />
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full h-full">
+      <div className="relative py-6 shadow-lg w-full h-full bg-black">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-semibold">{videoCall ? "Video Calling" : "Voice Calling"} </h2>
-          <span></span>
+          <h2 className="text-2xl pl-6 font-semibold text-white">{videoCall ? "Video Calling" : "Voice Calling"} </h2>
+          <div className="loader_login">
+            <div className="justify-content-center jimu-primary-loading"></div>
+          </div>
         </div>
-        <div className="video-container mb-4">
+        <div className="video-container">
           {!videoCall ?
             <>
               <div className="w-full mt-5 pt-20">
@@ -261,22 +263,24 @@ const CallingRoom: React.FC = () => {
             </>
           }
         </div>
-        <div className="text-center mb-4">
-          <h3 className="text-xl font-medium">{callingUserName != "" && callingUserName != null ? callingUserName : "Unknown"}</h3>
-        </div>
-        <div className="flex justify-center space-x-4">
-          {myStream && (
-            <>
-              {!sameUser && (
-                <button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full" onClick={handleCallingAccept}>
-                  <LuPhoneCall className="text-2xl" />
-                </button>
-              )}
-            </>
-          )}
-          <button className="bg-red-500 hover:bg-red-600 text-white p-4 rounded-full" onClick={handleEndCall}>
-            <LuPhoneOff className="text-2xl" />
-          </button>
+        <div className="absolute bottom-0 w-full">
+          <div className="text-center pb-6">
+            <h3 className="text-2xl font-semibold w-full text-white overflow-hidden">{callingUserName != "" && callingUserName != null ? callingUserName : "Unknown"}</h3>
+          </div>
+          <div className="flex justify-center space-x-4 mb-8">
+            {myStream && (
+              <>
+                {!sameUser && (
+                  <button className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full" onClick={handleCallingAccept}>
+                    <LuPhoneCall className="text-2xl" />
+                  </button>
+                )}
+              </>
+            )}
+            <button className="bg-red-500 hover:bg-red-600 text-white p-4 rounded-full" onClick={handleEndCall}>
+              <LuPhoneOff className="text-2xl" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

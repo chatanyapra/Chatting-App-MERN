@@ -1,4 +1,4 @@
-import { useEffect, useState, ChangeEvent } from 'react';
+import { useEffect, useState, ChangeEvent, useRef  } from 'react';
 import MessageBox from '../../components/MessageBox';
 import '../../components/components.css'; // Adjust this based on your CSS file location
 import useLogout from '../../hooks/useLogout';
@@ -11,6 +11,11 @@ import {Conversation} from "../../types/types";
 import useCallingHook from '../../hooks/useCallingHook';
 
 export default function Message() {
+    const [isChecked, setIsChecked] = useState<boolean>(true);
+    const [search, setSearch] = useState<string>('');
+    const [changeStyle, setChangeStyle] = useState<boolean>(true);
+    const [filteredConversations, setFilteredConversations] = useState<Conversation[]>([]);
+    const checkboxRef = useRef<HTMLInputElement>(null);
     let textColor = 'black';
     let darkMode = false;
 
@@ -49,15 +54,22 @@ export default function Message() {
     }, [selectedConversation])
 
     // -------------------------------code for search the input value--------------------------------
-    const [isChecked, setIsChecked] = useState<boolean>(true);
-    const [search, setSearch] = useState<string>('');
-    const [changeStyle, setChangeStyle] = useState<boolean>(true);
-    const [filteredConversations, setFilteredConversations] = useState<Conversation[]>([]);
-
-
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setIsChecked(event.target.checked);
     };
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (checkboxRef.current && !checkboxRef.current.contains(event.target as Node)) {
+                setIsChecked(true);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [checkboxRef]);
+
     useEffect(() => {
         search.length > 0 ? setChangeStyle(false) : setChangeStyle(true);
         // console.log(search);
@@ -86,10 +98,10 @@ export default function Message() {
                 onClick={logout}>
                 Logout
             </div>
-            <div className="flex px-14 mt-16 max-md:px-0 max-md:w-full ">
-                <div className={`max-md:w-full relative ${visibilityChat ? "hidden" : ""} border-solid border-2 border-gray-400 rounded-l-lg`}>
+            <div className="flex px-14 mt-16 max-md:px-0 max-md:w-full md:h-[calc(100vh-115px)] h-[calc(100vh-0px)]">
+                <div className={`max-md:w-full relative ${visibilityChat ? "hidden" : ""} border-solid border-2 border-gray-400 max-sm:rounded-lg rounded-l-lg`}>
 
-                    <div id="side-chat" className="shadow-md rounded-xl w-full bg-white z-50 max-md:shadow">
+                    <div id="side-chat" className="shadow-md rounded-xl max-md:w-full w-80 bg-white z-50 max-md:shadow">
 
                         {/* <!-- heading title --> */}
                         <div className="p-4 border-b  ">
@@ -99,7 +111,7 @@ export default function Message() {
                                 <h2 className={`text-2xl font-bold text-black ml-1 ${textColor === "" ? (darkMode ? 'text-white' : 'text-black') : textColor}`}> Chats </h2>
                                 {/* --------handle the search input -------------------- */}
                                 <div className="searchcontainer">
-                                    <input checked={isChecked} className="checkboxsearch" type="checkbox" onChange={handleCheckboxChange} />
+                                    <input checked={isChecked}  ref={checkboxRef} className="checkboxsearch" type="checkbox" onChange={handleCheckboxChange} />
                                     <div className="searchmainbox">
                                         <div className="iconContainer">
                                             <svg
@@ -111,7 +123,7 @@ export default function Message() {
                                                 <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"></path>
                                             </svg>
                                         </div>
-                                        <input className="search_input" value={search} onChange={(e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)} placeholder="Search" type="text" />
+                                        <input className="search_input" value={search} ref={checkboxRef} onChange={(e: ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)} placeholder="Search" type="text" />
                                     </div>
                                 </div>
 
@@ -122,13 +134,13 @@ export default function Message() {
                         <div className="small-scroll space-y-2 p-2 overflow-y-auto md:h-[calc(100vh-198px)] h-[calc(100vh-80px)]">
 
                                 {newSendMessage || changeStyle ? 
-                                conversations && conversations.map((conversation) => (
+                                conversations && conversations.map((conversation: Conversation) => (
                                     <SidebarUsers
                                         key={conversation._id}
                                         conversation={conversation as Conversation}
                                     />
                                 )) : 
-                                filteredConversations.length > 0 ? filteredConversations.map((conversation) => (
+                                filteredConversations.length > 0 ? filteredConversations.map((conversation: Conversation) => (
                                     <SidebarUsers
                                         key={conversation._id}
                                         conversation={conversation as Conversation}

@@ -89,11 +89,11 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
 
   let textColor = '';
   return (
-    <div className={`w-full max-w-screen-lg shadow-md overflow-hidden bg-white relative mt-0 max-md:${visibility ? 'visible' : 'hidden'} border-solid border-2 border-gray-400 rounded-r-lg`}>
+    <div className={`w-full max-w-screen-lg shadow-md overflow-hidden bg-white relative mt-0 max-md:${visibility ? 'visible' : 'hidden'} border-solid border-2 border-gray-400 max-sm:rounded-lg rounded-r-lg`}>
       {/* <!-- chat heading --> */}
       <div className="flex items-center justify-between gap-2 px-6 z-10 border-b dark:border-slate-700 uk-animation-slide-top-medium">
         <div className="flex items-center sm:gap-4 gap-2 md:py-4 py-2">
-          <div className="relative cursor-pointer max-md:hidden">
+          <div className="relative cursor-pointer">
             <img src={conversation.profilePic} alt="" className="w-11 h-11 rounded-full shadow" />
             {isOnline && (<div className="w-2 h-2 bg-teal-500 rounded-full absolute right-0 bottom-0 m-px"></div>)}
           </div>
@@ -122,7 +122,7 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
       </div>
 
       {/* <!-- chats bubble --> */}
-      <div className="small-scroll w-full p-5 py-10 overflow-y-auto md:h-[calc(100vh-260px)] h-[calc(100vh-195px)]" ref={lastMessageRef} style={{ overflowY: 'auto' }}>
+      <div className="small-scroll w-full p-3 py-10 overflow-y-auto md:h-[calc(100vh-260px)] h-[calc(100vh-120px)]" ref={lastMessageRef} style={{ overflowY: 'auto' }}>
         <div className="py-5 text-center text-sm lg:pt-8 h-auto overflow-hidden">
           <img src={conversation.profilePic} className="w-24 h-24 rounded-full mx-auto mb-3" alt="" />
           <div className="mt-8">
@@ -136,22 +136,23 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
       </div>
 
       {/* <!-- sending message area --> */}
-      <form onSubmit={handleSubmit} encType="multipart/form-data" className="flex items-center justify-center md:px-2 min-h-14 p-2">
-        <div className="w-full flex justify-between z-10 bg-white rounded-3xl">
-          <div className='w-full max-w-screen-lg overflow-hidden h-12'>
-          <InputEmoji
-          value={newMessage}
-          onChange={setNewMessage}
-          height={10} 
-          keepOpened={true}
-          placeholder="Write your message"
-          borderRadius={10}
-          shouldReturn={true}
-          borderColor={"rgb(71 85 105)"}
-          shouldConvertEmojiToImage={false}
-        />
+      <form onSubmit={handleSubmit} encType="multipart/form-data" className="flex items-center justify-center pb-1 pt-2 absolute bottom-0 left-0 w-full">
+        <div className="w-full flex justify-between items-center z-10 rounded-full">
+          <div className='w-10/12 min-md:w-11/12 max-w-screen-lg'>
+            <InputEmoji
+              value={newMessage}
+              onChange={setNewMessage}
+              height={10}
+              keepOpened={true}
+              placeholder="Write your message"
+              borderRadius={40}
+              inputClass='scroll-none h-10'
+              shouldReturn={true}
+              borderColor={"rgb(71 85 105)"}
+              shouldConvertEmojiToImage={false}
+            />
           </div>
-          <div title='Attach'>
+          <div title='Attach' className='mb-3'>
             <label htmlFor="file">
               <LuLink2 className='text-2xl mx-0.5 text-gray-500 mt-3.5 hover:text-blue-600 cursor-pointer' />
             </label>
@@ -159,7 +160,7 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
           </div>
           <button
             type="submit"
-            className="text-white w-10 h-10 shrink-0 p-2 border-t border-gray-400 rounded-full bg-green-200 mt-1 mx-2 shadow-md text-center"
+            className="text-white w-10 h-10 shrink-0 p-2 border-t border-gray-400 rounded-full bg-green-200 mx-2 shadow-md text-center"
             disabled={loading}
           >
             {loading ? <div className="loader"></div> : <LuSendHorizonal className="text-xl ml-0.5 flex text-blue-600" />}

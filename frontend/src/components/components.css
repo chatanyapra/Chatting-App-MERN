@@ -98,7 +98,9 @@
   background: rgb(233, 233, 233); 
   border-radius: 10px;
 }
-
+.scroll-none::-webkit-scrollbar {
+  display: none;
+}
 
   /* -----chatting css -profile */
   .collapsibleDiv {
@@ -125,7 +127,7 @@
   .searchmainbox {
     box-sizing: border-box;
     position: relative;
-    width: 230px;
+    width: 210px;
     margin-left: 10px;
     height: 37px;
     display: flex;
@@ -264,7 +266,7 @@
 .video-container {
   position: relative;
   width: 100%;
-  height: 77%;
+  height: 75%;
   background: #000;
 }
 .video-container .videoMainPlayer {
@@ -290,9 +292,15 @@
 .react-emoji-picker--wrapper {
   position: absolute !important;
   bottom: 0 !important;
-  right: 0 !important;
+  right: -25px !important;
   overflow: visible !important;
   height: 435px !important;
   width: 296px !important;
   z-index: 10 !important;
+}
+@media only screen and (max-width: 600px) {
+  .react-emoji-picker--wrapper {
+    width: 100% !important;
+    right: 0 !important;
+  }
 }

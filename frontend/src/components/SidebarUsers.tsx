@@ -15,7 +15,7 @@ function SidebarUsers({ conversation }: { conversation: Conversation }) {
     const messageNotification = conversation._id == newSendMessage ? true : false;
 
     return (
-        <div className={`md:w-80 w-full relative flex items-center gap-4 p-2 ${ isSelected ? 'bg-gray-100' : "" } duration-200 rounded-xl hover:bg-secondery cursor-pointer relative`}
+        <div className={`w-full relative flex items-center gap-4 p-2 ${ isSelected ? 'bg-gray-100' : "" } duration-200 rounded-xl hover:bg-secondery cursor-pointer relative`}
          onClick={()=> setSelectedConversation(conversation)}
         >
             <div className="relative w-14 h-14 shrink-0">
