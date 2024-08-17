@@ -3,8 +3,9 @@ import { useSocketContext } from "../context/SocketContext";
 import useListenMessage from "../hooks/useListenMessage";
 import useConversation from "../zustandStore/useConversation";
 import {Conversation} from "../types/types";
+import AiLoader from "./AiLoader";
 
-function SidebarUsers({ conversation }: { conversation: Conversation }) {
+function SidebarUsers({ conversation, auramicAiCall }: { conversation: Conversation, auramicAiCall: boolean }) {
 
     const {selectedConversation, setSelectedConversation} = useConversation();
     const isSelected = selectedConversation?._id === conversation._id;
@@ -19,7 +20,11 @@ function SidebarUsers({ conversation }: { conversation: Conversation }) {
          onClick={()=> setSelectedConversation(conversation)}
         >
             <div className="relative w-14 h-14 shrink-0">
-                <img src={conversation.profilePic} alt="" className="object-cover w-full h-full rounded-full" />
+                {auramicAiCall ? 
+                    <AiLoader/>
+                    :
+                    <img src={conversation.profilePic} alt="" className="object-cover w-full h-full rounded-full" />
+                }
                 {isOnline && (
                     <div className="w-4 h-4 absolute bottom-0 right-0  bg-green-500 rounded-full border border-white dark:border-slate-800">
                         <small className="text-cyan-50 font-bold relative bottom-2 left-1" style={{fontSize: '10px'}}></small>

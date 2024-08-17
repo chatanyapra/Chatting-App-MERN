@@ -57,8 +57,62 @@ export const sendMessage = asyncHandler(async (req, res) => {
         console.log("Error in Message Controller", error.message);
         res.status(400).json({ message: "Internal Server Error!" });
     }
-    // const receiverId = req.params.id;
-    // res.status(201).json({message: `Message sended! ${receiverId}`});
+})
+
+export const sendAuramicAiMessage = asyncHandler(async (message, image, receiverId) => {
+    try {
+        // const { message } = req.body;
+        // const { id: receiverId } = req.params;
+        const senderId = process.env.AURAMICAI;
+        console.log("message, image, receiverId---", message, image, receiverId);
+        
+        // const { question:message, image, userId:receiverId } = req.body;
+
+        let conversation = await Conversation.findOne({
+            participants: { $all: [senderId, receiverId] }
+        })
+        if (!conversation) {
+            conversation = await Conversation.create({
+                participants: [senderId, receiverId]
+            })
+        }
+        let fileUrl = null;
+        if (image) {
+            const result = await cloudinary.uploader.upload(image.path, {
+                resource_type: "auto"
+            });
+
+            fileUrl = result.secure_url;
+
+            fs.unlink(image.path, (err) => {
+                if (err) {
+                    console.error('Error deleting the file from the server:', err);
+                }
+            });
+        }
+        const newMessage = new Message({
+            senderId,
+            receiverId,
+            message,
+            fileUrl
+        })
+        if (newMessage) {
+            conversation.messages.push(newMessage._id);
+        }
+        await Promise.all([conversation.save(), newMessage.save()]);
+        // adding socket io to show live meesages changes---------------
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        if (receiverSocketId) {
+            //io.to(<socket_id>).emit() used to send event to specific client--------------
+            io.to(receiverSocketId).emit("newMessage", newMessage);
+        }
+
+        res.status(201).json({ newMessage, fileUrl });
+
+    } catch (error) {
+        console.log("Error in Message Controller", error.message);
+        res.status(400).json({ message: "Internal Server Error!" });
+    }
 })
 
 export const getMessages = asyncHandler(async (req, res) => {

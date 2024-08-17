@@ -5,7 +5,7 @@ import {UseGetConversation, Conversation } from "../types/types"
 const useGetConversation = (): UseGetConversation => {
     const [loading, setLoading] = useState<boolean>(false);
     const [conversations, setConversations] = useState<Conversation[]>([]);
-
+    const [auramicAi, setAuramicAi] = useState<string>("");
     useEffect(() => {
         const getConversations = async () => {
             setLoading(true);
@@ -16,9 +16,9 @@ const useGetConversation = (): UseGetConversation => {
                 if (data.error) {
                     throw new Error(data.error);
                 }
-                // console.log(data);
-                
-                setConversations(data as Conversation[]); // Ensure data is cast to Conversation[]
+                console.log(data);
+                setAuramicAi(data.hasSpecificId);
+                setConversations(data.filteredUsers as Conversation[]); // Ensure data is cast to Conversation[]
 
             } catch (error: any) {
                 toast.error(error.message);
@@ -30,7 +30,7 @@ const useGetConversation = (): UseGetConversation => {
         getConversations();
     }, []);
 
-    return { loading, conversations };
+    return { loading, conversations, auramicAi };
 };
 
 export default useGetConversation;

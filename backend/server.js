@@ -7,13 +7,17 @@ import authRoutes from "./routes/authRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import { app, server } from "./socket/socket.js";
+import bodyParser from 'body-parser';
+import cors from 'cors';
 
 const port = 5001;
 const __dirname = path.resolve();
 dotenv.config();
 
+app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
+app.use(bodyParser.json({ limit: '10mb' }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);

@@ -1,5 +1,6 @@
 import logoImage from "../assets/auramicimage.png";
 import { useAuthContext } from "../context/AuthContext";
+import AiLoader from "./AiLoader";
 // import {MyComponentProps} from "../types/types"
 
 const ChattingStart = () => {
@@ -14,8 +15,8 @@ const ChattingStart = () => {
             <small className="pt-0 pl-3 font-medium">@{authUser.username}</small>
           </div>
         </div>
-        <div className="loader_login">
-          <div className="justify-content-center jimu-primary-loading"></div>
+        <div>
+          <AiLoader/>
         </div>
       </div>
       <div>

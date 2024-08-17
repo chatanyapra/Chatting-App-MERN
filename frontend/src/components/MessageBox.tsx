@@ -9,6 +9,7 @@ import { MyComponentProps } from "../types/types";
 import { useAuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import peerService from "../peerService/peer";
+import AiLoader from './AiLoader';
 
 const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: MyComponentProps) => {
   const [newMessage, setNewMessage] = useState<string>('');
@@ -60,10 +61,9 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
     fileInput.value = '';
   };
 
-
-  // const handleOnEnter = async (text: string) => {
-  //   await sendMessage(text);
-  // };
+  const handleChangeInput = (text: string) => {
+    setNewMessage(text);
+  };
 
   const handleVideoCall = useCallback((video: boolean) => {
     if (authUser) {
@@ -99,7 +99,7 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
           </div>
           <div className="cursor-pointer">
             <div className="text-base font-bold">{conversation.fullname}</div>
-            <div className="text-xs text-green-500 font-semibold h-3"> {isOnline ? 'Online' : ''}</div>
+            <div className={`text-xs ${isOnline ? "text-green-500" : "text-gray-500"} font-semibold h-3`}> {isOnline ? 'Online' : 'Offline'}</div>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -113,11 +113,9 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
               <path strokeLinecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
             </svg>
           </button>
-          <button type="button" className="hover:bg-slate-100 p-1.5 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={`w-6 h-6 ${textColor}`}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-            </svg>
-          </button>
+          <div>
+            <AiLoader/>
+          </div>
         </div>
       </div>
 
@@ -141,7 +139,7 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
           <div className='w-10/12 min-md:w-11/12 max-w-screen-lg'>
             <InputEmoji
               value={newMessage}
-              onChange={setNewMessage}
+              onChange={handleChangeInput}
               height={10}
               keepOpened={true}
               placeholder="Write your message"

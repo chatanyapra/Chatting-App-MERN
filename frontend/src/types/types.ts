@@ -43,6 +43,7 @@ export interface Conversation {
   username: string;
   fullname: string;
   profilePic: string;
+  auramicAiCall: string;
 }
 
 export interface MessageType {
@@ -72,6 +73,7 @@ export interface GroupedMessages {
 
 export interface UseGetConversation {
 loading: boolean;
+auramicAi:string;
 conversations: Conversation[];
 }
 

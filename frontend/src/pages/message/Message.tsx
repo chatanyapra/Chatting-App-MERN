@@ -1,16 +1,18 @@
-import { useEffect, useState, ChangeEvent, useRef  } from 'react';
+import { useEffect, useState, ChangeEvent, useRef } from 'react';
 import MessageBox from '../../components/MessageBox';
-import '../../components/components.css'; // Adjust this based on your CSS file location
+import '../../components/components.css';
 import useLogout from '../../hooks/useLogout';
 import SidebarUsers from '../../components/SidebarUsers';
 import useGetConversation from '../../hooks/useGetConversation';
 import ChattingStart from '../../components/ChattingStart';
 import useConversation from '../../zustandStore/useConversation';
 import useListenMessage from '../../hooks/useListenMessage';
-import {Conversation} from "../../types/types";
+import { Conversation } from "../../types/types";
 import useCallingHook from '../../hooks/useCallingHook';
+import AuramicAi from '../../components/AuramicAi';
 
 export default function Message() {
+
     const [isChecked, setIsChecked] = useState<boolean>(true);
     const [search, setSearch] = useState<string>('');
     const [changeStyle, setChangeStyle] = useState<boolean>(true);
@@ -21,9 +23,10 @@ export default function Message() {
 
     const { logout } = useLogout();
     useCallingHook();
-    const { conversations } = useGetConversation();
+    const { auramicAi, conversations } = useGetConversation();
     const { selectedConversation, setSelectedConversation } = useConversation()
     const [visibilityChat, setVisibilityChat] = useState(false)
+    
 
     useEffect(() => {
         return () => setSelectedConversation(null)
@@ -111,7 +114,7 @@ export default function Message() {
                                 <h2 className={`text-2xl font-bold text-black ml-1 ${textColor === "" ? (darkMode ? 'text-white' : 'text-black') : textColor}`}> Chats </h2>
                                 {/* --------handle the search input -------------------- */}
                                 <div className="searchcontainer">
-                                    <input checked={isChecked}  ref={checkboxRef} className="checkboxsearch" type="checkbox" onChange={handleCheckboxChange} />
+                                    <input checked={isChecked} ref={checkboxRef} className="checkboxsearch" type="checkbox" onChange={handleCheckboxChange} />
                                     <div className="searchmainbox">
                                         <div className="iconContainer">
                                             <svg
@@ -132,25 +135,26 @@ export default function Message() {
                         </div>
 
                         <div className="small-scroll space-y-2 p-2 overflow-y-auto md:h-[calc(100vh-198px)] h-[calc(100vh-80px)]">
-
-                                {newSendMessage || changeStyle ? 
+                            {newSendMessage || changeStyle ?
                                 conversations && conversations.map((conversation: Conversation) => (
                                     <SidebarUsers
-                                        key={conversation._id}
+                                        key={conversation._id} 
+                                        auramicAiCall={conversation._id === auramicAi ? true : false}
                                         conversation={conversation as Conversation}
                                     />
-                                )) : 
+                                )) :
                                 filteredConversations.length > 0 ? filteredConversations.map((conversation: Conversation) => (
                                     <SidebarUsers
                                         key={conversation._id}
+                                        auramicAiCall={conversation._id === auramicAi ? true : false}
                                         conversation={conversation as Conversation}
                                     />
                                 )) : <div className='flex justify-center items-center h-full text-gray-400'>No result found</div>
-                                }
+                            }
                         </div>
                     </div>
                 </div>
-                {selectedConversation !== null ? <MessageBox conversation={selectedConversation} visibility={visibilityChat} /> : <ChattingStart />}
+                {selectedConversation === null ? <ChattingStart /> : (selectedConversation._id == auramicAi ? <AuramicAi visibility={visibilityChat} conversation={selectedConversation} /> : <MessageBox conversation={selectedConversation} visibility={visibilityChat} />) }
             </div>
         </>
     );
