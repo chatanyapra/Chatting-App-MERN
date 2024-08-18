@@ -9,14 +9,14 @@ import AiLoader from './AiLoader';
 
 const AuramicAi: React.FC<MyComponentProps> = ({ conversation, visibility }: MyComponentProps) => {
     const [newMessageText, setNewMessageText] = useState<string>('');
-    const { loading, sendMessage } = useSendMessage();
-    const [formattedText, setFormattedText] = useState<JSX.Element[] | string>([]); // Corrected initialization
+    const { sendMessage } = useSendMessage();
     const { messages } = useGetMessages();
     const { onlineUsers } = useSocketContext();
     const isOnline = onlineUsers.includes(conversation._id);
     const [selectedMedia, setSelectedMedia] = useState<string | null>(null);
     const [mediaType, setMediaType] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [buttonSubmit, setButtonSubmit] = useState<boolean>(false);
 
     const uploadData = async (file?: File | null) => {
         try {
@@ -32,16 +32,12 @@ const AuramicAi: React.FC<MyComponentProps> = ({ conversation, visibility }: MyC
                 method: "POST",
                 body: formData,
             });
-
             const text = await response.json();
-            const textAireply = text.response;
+            if(text.response){
+                setButtonSubmit(false);
+            }
             
-            const paragraphs = textAireply.split('\n').map((line: string, index: number) => (
-                <p key={index} style={{ marginBottom: '10px' }}>{line}</p>
-            ));
-            console.log("formattedText----------", paragraphs);
-            
-            setFormattedText(paragraphs.length ? paragraphs : 'No response received'); // Corrected assignment
+
             setSelectedMedia(null);
             setNewMessageText('');
         } catch (error) {
@@ -73,6 +69,7 @@ const AuramicAi: React.FC<MyComponentProps> = ({ conversation, visibility }: MyC
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setButtonSubmit(true);
         console.log("newMessageText--- ", newMessageText);
 
         const form = event.target as HTMLFormElement;
@@ -105,7 +102,7 @@ const AuramicAi: React.FC<MyComponentProps> = ({ conversation, visibility }: MyC
                 lastMessageRef.current.scrollTop = lastMessageRef.current.scrollHeight;
             }
         }, 100);
-    }, [messages]);
+    }, [messages, buttonSubmit]);
 
     return (
         <div className={`w-full max-w-screen-lg shadow-md overflow-hidden bg-white relative mt-0 max-md:${visibility ? 'visible' : 'hidden'} border-solid border-2 border-gray-400 max-sm:rounded-lg rounded-r-lg`}>
@@ -123,17 +120,23 @@ const AuramicAi: React.FC<MyComponentProps> = ({ conversation, visibility }: MyC
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div>
-                    </div>
                 </div>
             </div>
 
             {/* <!-- chats bubble --> */}
-            <div className="small-scroll w-full p-3 py-10 overflow-y-auto md:h-[calc(100vh-260px)] h-[calc(100vh-120px)]" ref={lastMessageRef} style={{ overflowY: 'auto' }}>
+            <div className="small-scroll relative w-full p-3 py-10 overflow-y-auto md:h-[calc(100vh-260px)] h-[calc(100vh-120px)]" ref={lastMessageRef} style={{ overflowY: 'auto' }}>
                 <div className="text-sm font-medium space-y-6">
                     <MessageText />
                 </div>
-                {formattedText && formattedText}
+                {buttonSubmit && (
+                    <section className="dots-container-text-loader relative ml-1 bg-slate-200 rounded-lg my-2 shadow-md">
+                        <div className='triangle-left-message'></div>
+                        <div className="dot-text-loader"></div>
+                        <div className="dot-text-loader"></div>
+                        <div className="dot-text-loader"></div>
+                    </section>
+                )}
+
             </div>
 
             {/* <!-- sending message area --> */}
@@ -149,9 +152,9 @@ const AuramicAi: React.FC<MyComponentProps> = ({ conversation, visibility }: MyC
                     <button
                         type="submit"
                         className="text-white w-10 h-10 shrink-0 p-2 border-t border-gray-400 rounded-full bg-green-200 mx-2 shadow-md text-center"
-                        disabled={loading}
+                        disabled={buttonSubmit}
                     >
-                        {loading ? <div className="loader"></div> : <LuSendHorizonal className="text-xl ml-0.5 flex text-blue-600" />}
+                        {buttonSubmit ? <div className="loader"></div> : <LuSendHorizonal className="text-xl ml-0.5 flex text-blue-600" />}
                     </button>
                 </div>
             </form>

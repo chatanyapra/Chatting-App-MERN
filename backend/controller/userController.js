@@ -43,7 +43,9 @@ export const auramicaiTextExtract = asyncHandler(async (req, res) => {
         console.log("image, question receiverId ----", image, question, receiverId);
 
         if (question !== "") {
-            question = "if asked, your name is AuramicAi, developer is Chatanya Pratap, features extracting text from images and the google ai features. i am using you in a chatting application. The user input question is: " + question;
+            question = `If you have any questions or need assistance, just let me know! I’m AuramicAi, a chatbot created by Chatanya Pratap. My main job is to extract text from images
+             and help you find answers based on that text. Simply upload an image with text, and I’ll do my best to provide the information you need. Feel free to ask me anything 
+             related to the text in the image!. the user question is : ` + question;
         }
         console.log("question:------", question);
 
@@ -51,7 +53,6 @@ export const auramicaiTextExtract = asyncHandler(async (req, res) => {
         if (req.file) {
             question += ". Answer from the given image's content: ";
             const imageBuffer = fs.readFileSync(image.path);
-            console.log("imageBuffer------ ", imageBuffer);
             
             const [result] = await client.textDetection(imageBuffer);
             const detections = result.textAnnotations;
@@ -70,15 +71,13 @@ export const auramicaiTextExtract = asyncHandler(async (req, res) => {
         
         const generationResult = await model.generateContent(prompt);
         const responseText = await generationResult.response.text();
-        // const responseText = "await generationResult.response.text();"
         if (responseText) {
             const sendMessageResponse = await sendAuramicDb(responseText, image, receiverId);
 
-            const data = sendMessageResponse;
-            console.log('Server response:--:--: ', data);
+            const newMessage = sendMessageResponse.newMessage;
+            console.log("responseText:", newMessage);
+            res.json({ response: newMessage });
         }
-        console.log("responseText:", responseText);
-        res.json({ response: responseText });
     } catch (error) {
         console.error('Error processing request:', error);
         res.status(500).json({ error: error.toString() });
@@ -128,8 +127,7 @@ const sendAuramicDb = async (message, image, receiverId) => {
         const newMessage = new Message({
             senderId,
             receiverId,
-            message,
-            fileUrl
+            message
         });
 
         if (newMessage) {
@@ -146,7 +144,7 @@ const sendAuramicDb = async (message, image, receiverId) => {
             io.to(receiverSocketId).emit("newMessage", newMessage);
         }
 
-        return { newMessage, fileUrl };
+        return { newMessage };
 
     } catch (error) {
         console.error("Error in Message Controller", error.message);
