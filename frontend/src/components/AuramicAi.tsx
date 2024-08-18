@@ -6,7 +6,6 @@ import useGetMessages from "../hooks/useGetMessages";
 import { useSocketContext } from '../context/SocketContext';
 import { MyComponentProps } from "../types/types";
 import AiLoader from './AiLoader';
-import axios from 'axios';
 
 const AuramicAi: React.FC<MyComponentProps> = ({ conversation, visibility }: MyComponentProps) => {
     const [newMessageText, setNewMessageText] = useState<string>('');
@@ -19,17 +18,25 @@ const AuramicAi: React.FC<MyComponentProps> = ({ conversation, visibility }: MyC
     const [mediaType, setMediaType] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const uploadData = async (base64Image?: string | null) => {
+    const uploadData = async (file?: File | null) => {
         try {
-            const response = await axios.post('api/users/extract-text', {
-                image: base64Image ? `data:image/jpeg;base64,${base64Image}` : null,
-                question: newMessageText || ""
+            const formData = new FormData();
+            formData.append('message', newMessageText);
+            if (file) {
+                formData.append('file', file);
+            }
+            console.log("file-----", file);
+            console.log("newMessageText-----", newMessageText);
+            
+            const response = await fetch(`api/users/extract-text`, {
+                method: "POST",
+                body: formData,
             });
 
-            const text = response.data.response;
-
-            // Split text into paragraphs or bullet points
-            const paragraphs = text.split('\n').map((line: string, index: number) => (
+            const text = await response.json();
+            const textAireply = text.response;
+            
+            const paragraphs = textAireply.split('\n').map((line: string, index: number) => (
                 <p key={index} style={{ marginBottom: '10px' }}>{line}</p>
             ));
             console.log("formattedText----------", paragraphs);
@@ -77,16 +84,8 @@ const AuramicAi: React.FC<MyComponentProps> = ({ conversation, visibility }: MyC
 
         await sendMessage(newMessageText, file);
 
-        if (!selectedMedia && !newMessageText) {
-            alert('Please select an image or provide a question.');
-            return;
-        }
-
-        let base64Image = null;
-
         if (selectedMedia) {
-            base64Image = selectedMedia.split(',')[1]; // Corrected: No need to use FileReader again
-            await uploadData(base64Image);
+            await uploadData(file);
         } else {
             await uploadData(null);
         }

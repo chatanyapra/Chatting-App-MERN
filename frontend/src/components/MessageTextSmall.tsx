@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuthContext } from "../context/AuthContext";
-import { formatTime } from "../utils/extractTime.ts"
+import { formatTime } from "../utils/extractTime.ts";
 import { MessageTextSmallProps } from "../types/types.ts";
 
 const MessageTextSmall: React.FC<MessageTextSmallProps> = ({ message }: MessageTextSmallProps) => {
@@ -18,7 +18,37 @@ const MessageTextSmall: React.FC<MessageTextSmallProps> = ({ message }: MessageT
 
   const isImageUpload = url?.includes("image/");
   const isVideoUpload = url?.includes("video/");
-
+  const formatMessage = (msg: string) => {
+    if (typeof msg !== 'string') {
+      return '';
+    }
+  
+    // Replace '\n' with <br /> for line breaks
+    let formattedMessage = msg.replace(/\n/g, '<br />');
+  
+    // Replace **text** with <strong>text</strong> for bold text
+    formattedMessage = formattedMessage.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+    // Replace _text_ with <em>text</em> for italic text
+    formattedMessage = formattedMessage.replace(/_(.*?)_/g, '<em>$1</em>');
+  
+    // Replace ~text~ with <del>text</del> for strikethrough text
+    formattedMessage = formattedMessage.replace(/~(.*?)~/g, '<del>$1</del>');
+  
+    // Replace ```text``` with <code>text</code> for monospace text
+    formattedMessage = formattedMessage.replace(/```(.*?)```/g, '<code>$1</code>');
+  
+    // Replace * or - followed by space and text with <ul><li>text</li></ul> for bulleted list
+    formattedMessage = formattedMessage.replace(/(^|\n)[*-] (.*?)(?=\n|$)/g, '<li>$2</li>');
+  
+    // Wrap all <li> elements in <ul> if there are any
+    if (formattedMessage.includes('<li>')) {
+      formattedMessage = `<ul>${formattedMessage}</ul>`;
+    }
+  
+    return formattedMessage;
+  };
+  
   return (
     <div className='w-full flex flex-col py-2'>
       {message.fileUrl == null ? (
@@ -26,9 +56,11 @@ const MessageTextSmall: React.FC<MessageTextSmallProps> = ({ message }: MessageT
           <div className="max-w-[calc(450px)] max-sm:max-w-screen-md min-w-20 mx-1">
             <div className={`flex ${bgColor} text-gray-800 rounded-lg rounded-br-none shadow-md relative pb-1`}>
               <div className={`${arrowClass}`}></div>
-              <div className="block px-3 py-2 break-words" style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>
-                {message.message}
-              </div>
+              <div
+                className="block px-3 py-2 break-words"
+                style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}
+                dangerouslySetInnerHTML={{ __html: formatMessage(message.message) }}
+              />
               <small className="text-gray-400 absolute -bottom-0.5 right-1">{formattedTime}</small>
             </div>
           </div>
@@ -49,7 +81,11 @@ const MessageTextSmall: React.FC<MessageTextSmallProps> = ({ message }: MessageT
                   </video>
                 )}
                 <div className="text-gray-800">
-                  <p className="text-sm mt-2 block break-words"  style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}>{message.message}</p>
+                  <p
+                    className="text-sm mt-2 block break-words"
+                    style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}
+                    dangerouslySetInnerHTML={{ __html: formatMessage(message.message) }}
+                  />
                 </div>
               </div>
               <small className="text-gray-400 absolute -bottom-0.5 right-1">{formattedTime}</small>
@@ -59,6 +95,6 @@ const MessageTextSmall: React.FC<MessageTextSmallProps> = ({ message }: MessageT
       )}
     </div>
   );
-}
+};
 
 export default MessageTextSmall;
