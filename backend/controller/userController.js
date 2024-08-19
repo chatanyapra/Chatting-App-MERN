@@ -11,7 +11,8 @@ import { io } from '../socket/socket.js';
 import cloudinary from '../cloudinary/cloudinaryConfig.js';
 import fs from 'fs';
 import { getReceiverSocketId } from "../socket/socket.js";
-
+import dotenv from 'dotenv';
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -21,7 +22,7 @@ const client = new vision.ImageAnnotatorClient({
     keyFilename: path.resolve(__dirname, '../config/api-learn-432706-d6966a1d489e.json')
 });
 
-const apiKey = process.env.GEMINI_API_KEY || "AIzaSyBogLPBdn-n_-pCI5Cz5fdacYEEkYoIDmM";
+const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
 export const getUserForSidebar = asyncHandler(async (req, res) => {
