@@ -16,7 +16,7 @@ const useGetConversation = (): UseGetConversation => {
                 if (data.error) {
                     throw new Error(data.error);
                 }
-                console.log(data);
+                // console.log(data);
                 setAuramicAi(data.hasSpecificId);
                 setConversations(data.filteredUsers as Conversation[]); // Ensure data is cast to Conversation[]
 

@@ -2,9 +2,13 @@ import React from 'react';
 import { useAuthContext } from "../context/AuthContext";
 import { formatTime } from "../utils/extractTime.ts";
 import { MessageTextSmallProps } from "../types/types.ts";
+import { useSelectTextContext } from '../context/SelectedTextContext.tsx';
+import useConversation from '../zustandStore/useConversation.ts';
 
 const MessageTextSmall: React.FC<MessageTextSmallProps> = ({ message }: MessageTextSmallProps) => {
   const { authUser } = useAuthContext();
+  const {setSelectedTextUser} = useSelectTextContext();
+  const { selectedConversation } = useConversation();
   const openImageInNewTab = (url: string | URL | undefined) => {
     window.open(url, '_blank');
   };
@@ -23,37 +27,45 @@ const MessageTextSmall: React.FC<MessageTextSmallProps> = ({ message }: MessageT
       return '';
     }
   
+    // Escape HTML characters for code blocks
+    const escapeHtml = (unsafe: string) => {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    };
+  
+    // Replace `code blocks` with <code>text</code> and escape HTML characters inside them
+    let formattedMessage = msg.replace(/```(.*?)```/gs, (_match:string, p1:any) => `<code>${escapeHtml(p1)}</code>`);
+  
     // Replace '\n' with <br /> for line breaks
-    let formattedMessage = msg.replace(/\n/g, '<br />');
-  
-    // Replace **text** with <strong>text</strong> for bold text
+    formattedMessage = formattedMessage.replace(/\n/g, '<br />');
+    
+    // Additional formatting (bold, italic, strikethrough, etc.)
     formattedMessage = formattedMessage.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  
-    // Replace _text_ with <em>text</em> for italic text
     formattedMessage = formattedMessage.replace(/_(.*?)_/g, '<em>$1</em>');
-  
-    // Replace ~text~ with <del>text</del> for strikethrough text
     formattedMessage = formattedMessage.replace(/~(.*?)~/g, '<del>$1</del>');
-  
-    // Replace ```text``` with <code>text</code> for monospace text
-    formattedMessage = formattedMessage.replace(/```(.*?)```/g, '<code>$1</code>');
-  
-    // Replace * or - followed by space and text with <ul><li>text</li></ul> for bulleted list
-    formattedMessage = formattedMessage.replace(/(^|\n)[*-] (.*?)(?=\n|$)/g, '<li>$2</li>');
-  
-    // Wrap all <li> elements in <ul> if there are any
-    if (formattedMessage.includes('<li>')) {
-      formattedMessage = `<ul>${formattedMessage}</ul>`;
-    }
   
     return formattedMessage;
   };
   
+  
+  const userText = message.message;
+  const handleSelectText = () => {
+    // console.log("selectedConversation.--------------");
+    if(selectedConversation?._id){
+      // console.log("selectedConversation.--------------");
+      let selectedTextUserId = selectedConversation?._id;
+      setSelectedTextUser({ key: selectedTextUserId, value: userText });
+    }
+  }
   return (
-    <div className='w-full flex flex-col py-2'>
+    <div className='w-full flex flex-col py-2 cursor-default md:px-2' onDoubleClick={handleSelectText}>
       {message.fileUrl == null ? (
         <div className={`flex ${chatClassName}`}>
-          <div className="max-w-[calc(450px)] max-sm:max-w-screen-md min-w-20 mx-1">
+          <div className="max-w-[calc(650px)] max-sm:max-w-screen-md min-w-20 mx-1">
             <div className={`flex ${bgColor} text-gray-800 rounded-lg rounded-br-none shadow-md relative pb-1`}>
               <div className={`${arrowClass}`}></div>
               <div
@@ -67,7 +79,7 @@ const MessageTextSmall: React.FC<MessageTextSmallProps> = ({ message }: MessageT
         </div>
       ) : (
         <div className={`flex ${chatClassName}`}>
-          <div className="max-w-[calc(450px)] max-sm:max-w-screen-md min-w-20 mx-1">
+          <div className="max-w-[calc(650px)] max-sm:max-w-screen-md min-w-20 mx-1">
             <div className={`flex ${bgColor} text-gray-800 rounded-lg rounded-br-none shadow-md relative pb-1`}>
               <div className={`${arrowClass}`}></div>
               <div className="flex flex-col p-3 rounded-lg">

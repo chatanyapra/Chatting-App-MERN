@@ -101,7 +101,7 @@ export default function Message() {
                 onClick={logout}>
                 Logout
             </div>
-            <div className="flex px-14 mt-16 max-md:px-0 max-md:w-full md:h-[calc(100vh-115px)] h-[calc(100vh-0px)]">
+            <div className="flex px-14 mt-16 max-md:px-0 max-md:w-full md:h-[calc(100vh-115px)] h-[calc(100vh-0px)] m-auto">
                 <div className={`max-md:w-full relative ${visibilityChat ? "hidden" : ""} border-solid border-2 border-gray-400 max-sm:rounded-lg rounded-l-lg`}>
 
                     <div id="side-chat" className="shadow-md rounded-xl max-md:w-full w-80 bg-white z-50 max-md:shadow">

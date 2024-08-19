@@ -89,7 +89,7 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
 
   let textColor = '';
   return (
-    <div className={`w-full max-w-screen-lg shadow-md overflow-hidden bg-white relative mt-0 max-md:${visibility ? 'visible' : 'hidden'} border-solid border-2 border-gray-400 max-sm:rounded-lg rounded-r-lg`}>
+    <div className={`w-full max-w-screen-xl shadow-md overflow-hidden bg-white relative mt-0 max-md:${visibility ? 'visible' : 'hidden'} border-solid border-2 border-gray-400 max-sm:rounded-lg rounded-r-lg`}>
       {/* <!-- chat heading --> */}
       <div className="flex items-center justify-between gap-2 px-6 z-10 border-b dark:border-slate-700 uk-animation-slide-top-medium">
         <div className="flex items-center sm:gap-4 gap-2 md:py-4 py-2">
@@ -136,7 +136,7 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
       {/* <!-- sending message area --> */}
       <form onSubmit={handleSubmit} encType="multipart/form-data" className="flex items-center justify-center pb-1 pt-2 absolute bottom-0 left-0 w-full">
         <div className="w-full flex justify-between items-center z-10 rounded-full">
-          <div className='w-10/12 min-md:w-11/12 max-w-screen-lg'>
+          <div className='w-10/12 min-md:w-11/12 max-w-screen-xl'>
             <InputEmoji
               value={newMessage}
               onChange={handleChangeInput}
@@ -158,7 +158,7 @@ const MessageBox: React.FC<MyComponentProps> = ({ conversation, visibility }: My
           </div>
           <button
             type="submit"
-            className="text-white w-10 h-10 shrink-0 p-2 border-t border-gray-400 rounded-full bg-green-200 mx-2 shadow-md text-center"
+            className="text-white w-10 h-10 shrink-0 p-2 border-t border-gray-400 rounded-full mx-2 shadow-md text-center"
             disabled={loading}
           >
             {loading ? <div className="loader"></div> : <LuSendHorizonal className="text-xl ml-0.5 flex text-blue-600" />}

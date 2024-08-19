@@ -39,7 +39,7 @@ const useLogin = () => {
             if(data.error){
                 throw new Error(data.error);
             }
-            console.log(data);
+            // console.log(data);
             
             localStorage.setItem("auramic-logged-user", JSON.stringify(data));
             setAuthUser(data);

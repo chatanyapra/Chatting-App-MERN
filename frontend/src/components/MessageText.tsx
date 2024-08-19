@@ -7,7 +7,6 @@ import {MessageType, GroupedMessages} from "../types/types.ts";
 function MessageText() {
   const { loading, messages } = useGetMessages(); 
   const groupedMessages = groupMessagesByDate(messages);
-  console.log("groupedMessages----", groupedMessages);
   
 
   return (

@@ -40,24 +40,26 @@ export const auramicaiTextExtract = asyncHandler(async (req, res) => {
         const image = req.file;
 
         const receiverId = req.user._id;
-        console.log("image, question receiverId ----", image, question, receiverId);
+        // console.log("image, question receiverId ----", image, question, receiverId);
 
         if (question !== "") {
-            question = `If you have any questions or need assistance, just let me know! I’m AuramicAi, a chatbot created by Chatanya Pratap. My main job is to extract text from images
-             and help you find answers based on that text. Simply upload an image with text, and I’ll do my best to provide the information you need. Feel free to ask me anything 
-             related to the text in the image!. the user question is : ` + question;
+            question = `If you have any questions or need assistance or about you, just let me know! I’m AuramicAi, a chatbot created by Chatanya Pratap. My main job is to extract text from images
+             and help you find answers based on that question. Simply upload an image with question, and I’ll do my best to provide the information you need. Feel free to ask me anything 
+             related to the text in the image!. the user input question is : ` + question + `. Answer the user input question from the given image's content or previous result from you as required.`;
         }
-        console.log("question:------", question);
+        // console.log("question:------", question);
 
+        if (question.length > 3000) {
+            return res.status(400).json({ error: 'String length exceeds 3000 characters' });
+        }
         let extractedText = "";
         if (req.file) {
-            question += ". Answer from the given image's content: ";
             const imageBuffer = fs.readFileSync(image.path);
             
             const [result] = await client.textDetection(imageBuffer);
             const detections = result.textAnnotations;
             extractedText = detections[0]?.description;
-            console.log("extractedText:", extractedText);
+            // console.log("extractedText:", extractedText);
             if (!extractedText || extractedText === "") {
                 return res.status(400).json({ error: 'No text detected in the image' });
             }
@@ -67,7 +69,7 @@ export const auramicaiTextExtract = asyncHandler(async (req, res) => {
             model: "gemini-1.5-flash",
         });
         const prompt = question + extractedText;
-        console.log("prompt---  ", prompt);
+        // console.log("prompt---  ", prompt);
         
         const generationResult = await model.generateContent(prompt);
         const responseText = await generationResult.response.text();
@@ -75,7 +77,7 @@ export const auramicaiTextExtract = asyncHandler(async (req, res) => {
             const sendMessageResponse = await sendAuramicDb(responseText, image, receiverId);
 
             const newMessage = sendMessageResponse.newMessage;
-            console.log("responseText:", newMessage);
+            // console.log("responseText:", newMessage);
             res.json({ response: newMessage });
         }
     } catch (error) {
@@ -87,7 +89,7 @@ export const auramicaiTextExtract = asyncHandler(async (req, res) => {
 const sendAuramicDb = async (message, image, receiverId) => {
     try {
         const senderId = "66c048e50d7696b4b17b5d53";
-        console.log("message, image, receiverId---sendAuramicDb***********", message, image, receiverId);
+        // console.log("message, image, receiverId---sendAuramicDb***********", message, image, receiverId);
         
         let conversation = await Conversation.findOne({
             participants: { $all: [senderId, receiverId] }
@@ -104,7 +106,7 @@ const sendAuramicDb = async (message, image, receiverId) => {
             const stats = fs.statSync(image.path);
             const imageSizeInMB = stats.size / (1024 * 1024);
             const maxSizeInMB = 5;
-            console.log("stats= statSync(image.path);", stats);
+            // console.log("stats= statSync(image.path);", stats);
             
             if (imageSizeInMB > maxSizeInMB) {
                 throw new Error(`Image size exceeds the ${maxSizeInMB}MB limit.`);
@@ -115,7 +117,7 @@ const sendAuramicDb = async (message, image, receiverId) => {
                 resource_type: "image"
             });
             fileUrl = result.secure_url;
-            console.log("fileUrl -- ", fileUrl);
+            // console.log("fileUrl -- ", fileUrl);
             
             fs.unlink(image.path, (err) => {
                 if (err) {
@@ -138,7 +140,7 @@ const sendAuramicDb = async (message, image, receiverId) => {
 
         // Emit socket event for live messages
         const receiverSocketId = getReceiverSocketId(receiverId);
-        console.log("receiverSocketId ------  ", receiverSocketId);
+        // console.log("receiverSocketId ------  ", receiverSocketId);
         
         if (receiverSocketId) {
             io.to(receiverSocketId).emit("newMessage", newMessage);

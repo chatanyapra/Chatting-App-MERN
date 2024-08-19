@@ -29,12 +29,12 @@ export const SocketContextProvider = ({ children }: SocketContextProviderProps) 
 
     useEffect(() => {
         if (authUser) {
-            const socketnew = io(`http://localhost:5001`, { // Changed port to 5001
+            const socketnew = io(`https://auramic-chatting.onrender.com`, { // Changed port to 5001
                 query: {
                     userId: authUser._id,
                 },
             });
-            console.log("socketnew - ", socketnew);
+            // console.log("socketnew - ", socketnew);
 
             setSocket(socketnew);
             socketnew.on("getOnlineUsers", (users: string[]) => {

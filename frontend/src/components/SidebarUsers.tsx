@@ -26,15 +26,15 @@ function SidebarUsers({ conversation, auramicAiCall }: { conversation: Conversat
                     <img src={conversation.profilePic} alt="" className="object-cover w-full h-full rounded-full" />
                 }
                 {isOnline && (
-                    <div className="w-4 h-4 absolute bottom-0 right-0  bg-green-500 rounded-full border border-white dark:border-slate-800">
+                    <div className="w-4 h-4 absolute bottom-0 right-0  bg-green-500 rounded-full border border-white ">
                         <small className="text-cyan-50 font-bold relative bottom-2 left-1" style={{fontSize: '10px'}}></small>
                     </div>
                 )}
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1.5">
-                    <div className="mr-auto text-sm text-black dark:text-white font-bold">{conversation.fullname}</div>
-                    <div className="text-xs font-light text-gray-500 dark:text-white/70">09:40AM</div>
+                    <div className="mr-auto text-sm text-black font-bold">{conversation.fullname}</div>
+                    <div className="text-xs font-light text-gray-500">09:40AM</div>
                 </div>
                 <div className="font-medium overflow-hidden text-gray-600 text-ellipsis text-sm whitespace-nowrap">Send the messages...💬</div>
             </div>

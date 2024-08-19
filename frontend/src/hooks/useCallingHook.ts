@@ -11,12 +11,12 @@ const useCallingHook = () => {
   const {setCallingUserName} =  useAuthContext();
 
   const handleUserJoined = useCallback(async(data: UserJoinedDataRequest) => {
-    console.log("User connecting request =-- ", data);
+    // console.log("User connecting request =-- ", data);
     const {username, userId, room, video} = data;
     setCallingUserName(username);
 
     let userroom = room;
-    console.log("userroom = authUser._id", userroom, "userId - ", userId, " video -", video);
+    // console.log("userroom = authUser._id", userroom, "userId - ", userId, " video -", video);
     socket?.emit("room:join", { userId, room : userroom, username, video });
     navigate(`/room/${userroom}`);
   },[socket]);

@@ -14,7 +14,7 @@ const useSendMessage = () => {
             if (file) {
                 formData.append('file', file);
             }
-            console.log("formData- ", file);
+            // console.log("formData- ", file);
             
 
             const res = await fetch(`/api/message/send/${selectedConversation?._id}`, {
@@ -23,7 +23,7 @@ const useSendMessage = () => {
             });
 
             const data = await res.json();
-            console.log("data  - - ", data);
+            // console.log("data  - - ", data);
             
             if (data.error) {
                 throw new Error(data.error);
