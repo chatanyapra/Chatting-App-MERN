@@ -11,7 +11,7 @@ const io = new Server(server, {
         credentials: true
     }
 });
-
+// https://auramic-chatting.onrender.com
 let userSocketMap = {}; // {userid: socket.id}
 
 export const getReceiverSocketId = (receiverId) => {

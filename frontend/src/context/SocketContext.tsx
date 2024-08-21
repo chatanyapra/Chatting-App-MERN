@@ -40,6 +40,8 @@ export const SocketContextProvider = ({ children }: SocketContextProviderProps) 
             socketnew.on("getOnlineUsers", (users: string[]) => {
                 setOnlineUsers(users);
             });
+            console.log("onlineUsers ----------", onlineUsers);
+            
             return () => {
                 socketnew.close();
             };

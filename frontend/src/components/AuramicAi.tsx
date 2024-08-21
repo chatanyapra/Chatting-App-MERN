@@ -22,15 +22,14 @@ const AuramicAi: React.FC<MyComponentProps> = ({ conversation, visibility }: MyC
     const [buttonSubmit, setButtonSubmit] = useState<boolean>(false);
     const [selectedText, setSelectedText] = useState<boolean>(false);
 
-    const uploadData = async (textUser:string, file?: File | null) => {
+    const uploadData = async (textUser:string, previousText: string, file?: File | null) => {
         try {
             const formData = new FormData();
             formData.append('message', textUser);
+            formData.append('previousMessage', previousText);
             if (file) {
                 formData.append('file', file);
             }
-            // console.log("file-----", file);
-            // console.log("newMessageText-----", textUser);
             
             const response = await fetch(`api/users/extract-text`, {
                 method: "POST",
@@ -85,9 +84,10 @@ const AuramicAi: React.FC<MyComponentProps> = ({ conversation, visibility }: MyC
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setButtonSubmit(true);
-        let textUser = newMessageText
+        let textUser = newMessageText;
+        let previousText = "";
         if(selectedText){
-            textUser = textUser + " and the previous result/question is: (`" +  selectedTextUser?.value + "`)";
+            previousText = selectedTextUser?.value + " ";
         }
         // console.log("newMessageText--- textUser------ ", textUser);
 
@@ -106,9 +106,9 @@ const AuramicAi: React.FC<MyComponentProps> = ({ conversation, visibility }: MyC
         // console.log("newMessageText--- textUser------ ", textUser);
 
         if (selectedMedia) {
-            await uploadData(textUser, file);
+            await uploadData(textUser, previousText, file);
         } else {
-            await uploadData(textUser, null);
+            await uploadData(textUser, previousText, null);
         }
     };
 
