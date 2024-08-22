@@ -85,11 +85,6 @@ export const auramicaiTextExtract = asyncHandler(async (req, res) => {
         let result;
         if(imagePart){
             result = await model.generateContent([prompt, imagePart]);
-            fs.unlink(image.path, (err) => {
-                if (err) {
-                    console.error('Error deleting the file from the server:', err);
-                }
-            });
         }else{
             result = await model.generateContent([prompt]);
         }
@@ -108,6 +103,13 @@ export const auramicaiTextExtract = asyncHandler(async (req, res) => {
             if (receiverSocketId) {
                 io.to(receiverSocketId).emit("newMessage", newMessage);
             }
+        }
+        if(imagePart){
+            fs.unlink(image.path, (err) => {
+                if (err) {
+                    console.error('Error deleting the file from the server:', err);
+                }
+            });
         }
     } catch (error) {
         console.error('Error processing request:', error);
