@@ -112,6 +112,13 @@ export const auramicaiTextExtract = asyncHandler(async (req, res) => {
                 io.to(receiverSocketId).emit("newMessage", newMessage);
             }
         }
+        if(imagePart){
+            fs.unlink(image.path, (err) => {
+                if (err) {
+                    console.error('Error deleting the file from the server:', err);
+                }
+            });
+        }
     } catch (error) {
         console.error('Error processing request:', error);
         res.status(500).json({ error: error.toString() });
