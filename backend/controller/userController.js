@@ -18,9 +18,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 
-const client = new vision.ImageAnnotatorClient({
-    keyFilename: path.resolve(__dirname, '../config/api-learn-432706-d6966a1d489e.json')
-});
+// const client = new vision.ImageAnnotatorClient({
+//     keyFilename: path.resolve(__dirname, '../config/api-learn-432706-d6966a1d489e.json')
+// });
 
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
@@ -38,27 +38,35 @@ export const getUserForSidebar = asyncHandler(async (req, res) => {
 export const auramicaiTextExtract = asyncHandler(async (req, res) => {
     try {
         let { message: question, previousMessage } = req.body;
-        const image = req.file;
+        const image = req.file || null;
 
         const receiverId = req.user._id;
         console.log("image, question receiverId ----", image, question, receiverId);
 
         if (question !== "") {
-            question = `If you have any questions or need assistance or about you, just let me know! I’m AuramicAi, a chatbot created by Chatanya Pratap. your about/features (
-            I can generate creative and informative text in various formats, including stories, articles, poems, code, scripts, musical pieces, email, letters, etc. 
-            I can translate languages, write different kinds of creative content, and answer your questions in an informative way. 
-            I can summarize text, provide different creative text formats, and answer your questions in an informative way. 
-            I can help you find answers based on image, Simply upload an image with question, and I’ll do my best to provide the information you need etc. ). 
-            The user given input question is : ` + question;
+            question = `The user input is: "${question}". 
+            You are AuramicAi, a assistant that works inside this application. 
+            Your task is to answer questions or provide relevant information based on the user's input. 
+            You can generate creative content (stories, articles, poems, code, scripts, music, emails, etc.), summarize texts, translate languages,Image Analysis , and offer detailed explanations or answers to the user's queries. 
+            If an image is provided, analyze the image and incorporate relevant details into your response. 
+            Use this to assist the user effectively.`;
         }
-        if(previousMessage !== ""){
-            question = question + "This might be a previous result/question/selected text and you can work on this text under brackets: (`" + previousMessage + "`)";
+        
+        if (previousMessage !== "") {
+            question += ` Here is the context from a previous response or selected text: "${previousMessage}". 
+            Please consider this while formulating your answer.`;
         }
-        question = question + `. give the answer of user input question from the given image or previous result/question/selected text as required.`;
-
+        
+        if (image) {
+            question += ` An image has been provided. Analyze the image and use the information to enhance your answer to the user's query.`;
+        }
+        
+        question += ` Provide a clear and helpful answer to the user's query based on the text, image, or previous context.`;
+        
         if (question.length > 3000) {
             return res.status(400).json({ error: 'String length exceeds 3000 characters' });
         }
+        
 
         console.log("question:------", question);
         let extractedText = "";
@@ -85,11 +93,6 @@ export const auramicaiTextExtract = asyncHandler(async (req, res) => {
         let result;
         if(imagePart){
             result = await model.generateContent([prompt, imagePart]);
-            fs.unlink(image.path, (err) => {
-                if (err) {
-                    console.error('Error deleting the file from the server:', err);
-                }
-            });
         }else{
             result = await model.generateContent([prompt]);
         }
@@ -97,7 +100,7 @@ export const auramicaiTextExtract = asyncHandler(async (req, res) => {
         console.log("result.response.text()---- ",responseText)
         if (responseText) {
             let newMessage;
-            const sendMessageResponse = await sendAuramicDb(responseText, receiverId);
+            const sendMessageResponse = await sendAuramicDb(responseText, receiverId, image);
             if(sendMessageResponse){
                 newMessage = sendMessageResponse.newMessage;
             }else{
@@ -115,7 +118,7 @@ export const auramicaiTextExtract = asyncHandler(async (req, res) => {
     }
 });
 
-const sendAuramicDb = async (message, receiverId) => {
+const sendAuramicDb = async (message, receiverId, image) => {
     try {
         const senderId = "66c048e50d7696b4b17b5d53";
 
@@ -125,6 +128,13 @@ const sendAuramicDb = async (message, receiverId) => {
         if (!conversation) {
             conversation = await Conversation.create({
                 participants: [senderId, receiverId]
+            });
+        }
+        if(image){
+            fs.unlink(image.path, (err) => {
+                if (err) {
+                    console.error('Error deleting the file from the server:', err);
+                }
             });
         }
 

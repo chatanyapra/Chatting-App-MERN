@@ -123,12 +123,11 @@ const AuramicAi: React.FC<MyComponentProps> = ({ conversation, visibility }: MyC
                 lastMessageRef.current.scrollTop = lastMessageRef.current.scrollHeight;
             }
         }, 100);
-    }, [messages, buttonSubmit]);
+    }, [messages, setButtonSubmit]);
     
     useEffect(() => {
         if(selectedTextUser?.key == conversation._id){
             setSelectedText(true);
-            // console.log("selectedTextUser --- **** ", selectedTextUser.value);
         }
     },[setSelectedTextUser, setNewMessageText, setSelectedText])
 
