@@ -9,7 +9,7 @@ const ChattingStart = () => {
     <div className={`w-full shadow-md bg-white overflow-hidden max-md:mt-20 max-md:hidden border-solid border-2 border-gray-400 rounded-r-lg`}>
       <div className="w-full flex justify-between align-middle p-2">
         <div className="flex">
-          <img src={authUser.profilePic} className="w-14 h-14" alt="" />
+          <img src={authUser.profilePic} className="w-14 h-14 rounded-full" alt="" />
           <div className="flex flex-col">
             <h4 className="pt-2 pl-3 font-semibold">{authUser.fullname}</h4>
             <small className="pt-0 pl-3 font-medium">@{authUser.username}</small>
