@@ -20,7 +20,7 @@ export const createUser = asyncHandler(async (req, res) => {
         
         // profile pics
         const boyProfilePic = `https://avatar.iran.liara.run/public/boy/?username=${username}`;
-        const girlProfilePic = `https://avatar.iran.liara.run/public/boy/?username=${username}`;
+        const girlProfilePic = `https://avatar.iran.liara.run/public/girl/?username=${username}`;
         // password hashing
         const hashedPassword= await bcrypt.hash(password, 10);
         console.log(hashedPassword);
